@@ -1,10 +1,9 @@
 package goes
 
 import (
+	"fmt"
 	"strings"
 	"testing"
-
-	"github.com/kr/pretty"
 )
 
 func TestLexComment(t *testing.T) {
@@ -13,13 +12,19 @@ func TestLexComment(t *testing.T) {
 		context string
 	}{
 		{"// single line comment", "single line commment"},
+		{`// single with line terminator 
+			
+			`, "single with line terminator"},
 	}
 
 	for _, v := range sample {
-		tkns, err := lex(strings.NewReader(v.src))
+		tkns, err := lex(
+			strings.NewReader(v.src),
+			terminatorLexer{}, commentLexer{},
+		)
 		if err != nil {
 			t.Fatal(err)
 		}
-		pretty.Println(tkns)
+		fmt.Println(tkns)
 	}
 }
