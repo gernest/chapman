@@ -155,7 +155,10 @@ func (b *bufioScanner) next() (rune, int, error) {
 }
 
 func (b *bufioScanner) peek() (ch rune, size int, err error) {
-	return b.peekAt(1)
+	defer func() {
+		err = b.src.UnreadByte()
+	}()
+	return b.src.ReadRune()
 }
 
 // reads the nth rune without advancing the reader
@@ -163,6 +166,21 @@ func (b *bufioScanner) peekAt(n int) (ch rune, size int, err error) {
 	max := n * utf8.UTFMax
 	bv, err := b.src.Peek(max)
 	if err != nil {
+		if err == io.EOF {
+			// try reading a small chunk assuming the unicode chars are of size
+			// 2
+			bv, err = b.src.Peek(2 * n)
+			if err != nil {
+				if err == io.EOF {
+					// try reading a small chunk assuming the unicode chars are
+					// of size n
+					bv, err = b.src.Peek(n)
+					if err != nil {
+						return 0, 0, err
+					}
+				}
+			}
+		}
 		return 0, 0, err
 	}
 	width := 0
