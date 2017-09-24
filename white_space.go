@@ -31,35 +31,35 @@ func isWhiteSpace(ch rune) bool {
 func (w whiteSpaceLexer) lext(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
-		start, end = ctx.lastToken.end, start
+		start, end = ctx.lastToken.End, start
 	}
 	n, size, err := s.next()
 	if err != nil {
 		return nil, err
 	}
-	end.column += size
+	end.Column += size
 	if isWhiteSpace(n) {
 		tk := &token{
-			start: start,
-			end:   end,
-			text:  string(n),
+			Start: start,
+			End:   end,
+			Text:  string(n),
 		}
 		switch n {
 		case 0x0009:
-			tk.kind = TAB
+			tk.Kind = TAB
 		case 0x000B:
-			tk.kind = VT
+			tk.Kind = VT
 		case 0x000C:
-			tk.kind = FF
+			tk.Kind = FF
 		case 0x0020:
-			tk.kind = SP
+			tk.Kind = SP
 		case 0x00A0:
-			tk.kind = NBSP
+			tk.Kind = NBSP
 		case 0xFEFF:
-			tk.kind = ZWNBSP
+			tk.Kind = ZWNBSP
 		default:
 			if unicode.IsSpace(n) {
-				tk.kind = USP
+				tk.Kind = USP
 			}
 		}
 		return tk, nil

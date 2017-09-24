@@ -2,6 +2,7 @@ package goes
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"io"
 	"unicode/utf8"
@@ -11,32 +12,40 @@ const unexpectedTkn = `%s : unexpected token at %v`
 
 type kind uint
 
-func (k kind) String() string {
-	switch k {
-	case comment:
-		return "COMMENT"
-	case lineTerminator:
-		return "LINE_TERMINATOR"
-	default:
-		return "UNKOWN"
-	}
-}
-
 type token struct {
-	text  string
-	kind  kind
-	start position
-	end   position
+	Text  string
+	Kind  kind   `json:"-"`
+	RKind string `json:"Kind"`
+	Start position
+	End   position
 }
 
-func (t *token) String() string {
-	return fmt.Sprintf("<%s start(%v): end(%s)>", t.kind.String(), t.start, t.end)
+func printToken(tk *token) []byte {
+	tk.RKind = tk.Kind.String()
+	b, err := json.MarshalIndent(tk, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return b
+}
+
+func decodeToken(b []byte) (*token, error) {
+	t := &token{}
+	err := json.Unmarshal(b, t)
+	if err != nil {
+		return nil, err
+	}
+	t.Kind = getKind(t.RKind)
+	return t, nil
 }
 
 // lexical token types
 const (
-	eof kind = iota
+	Unknown kind = iota
+	eof
 	comment
+	SingleLineComment
+	MultiLineComment
 
 	lineTerminator
 	LF //LINE FEED
@@ -53,6 +62,80 @@ const (
 	ZWNBSP // ZERO WIDTH NO-BREAK SPACE
 	USP    //Any other Unicode “Separator, space” code poin
 )
+
+func (k kind) String() string {
+	switch k {
+	case SingleLineComment:
+		return "SINGLE_LINE_COMMENT"
+	case MultiLineComment:
+		return "MULTI_LINE_COMMENT"
+	case eof:
+		return "EOF"
+	case LF:
+		return "LINE_FEED"
+	case CR:
+		return "CARRIAGE_RETURN"
+	case LS:
+		return "LINE_SEPARATOR"
+	case PS:
+		return "PARAGRAPH_SEPARATOR"
+	case TAB:
+		return "CHARACTER_TABULATION"
+	case VT:
+		return "LINE_TABULATION"
+	case FF:
+		return "FORM_FEED"
+	case SP:
+		return "SPACE"
+	case NBSP:
+		return "NO_BREAK_SPACE"
+	case ZWNBSP:
+		return "ZERO_WIDTH_NO_BREAK_SPACE"
+	case USP:
+		return "OTHER_SPACE"
+	default:
+		return "UNKOWN"
+	}
+}
+
+func (k kind) MarshalJSON() ([]byte, error) {
+	return json.Marshal(k.String())
+}
+
+func getKind(k string) kind {
+	switch k {
+	case "SINGLE_LINE_COMMENT":
+		return SingleLineComment
+	case "MULTI_LINE_COMMENT":
+		return MultiLineComment
+	case "EOF":
+		return eof
+	case "LINE_FEED":
+		return LF
+	case "CARRIAGE_RETURN":
+		return CR
+	case "LINE_SEPARATOR":
+		return LS
+	case "PARAGRAPH_SEPARATOR":
+		return PS
+	case "CHARACTER_TABULATION":
+		return TAB
+	case "LINE_TABULATION":
+		return VT
+	case "FORM_FEED":
+		return FF
+	case "SPACE":
+		return SP
+	case "NO_BREAK_SPACE":
+		return NBSP
+	case "ZERO_WIDTH_NO_BREAK_SPACE":
+		return ZWNBSP
+	case "OTHER_SPACE":
+		return USP
+	default:
+		return Unknown
+	}
+}
 
 type scanner interface {
 	next() (rune, int, error)
@@ -109,12 +192,12 @@ type context struct {
 }
 
 type position struct {
-	line   int
-	column int
+	Line   int
+	Column int
 }
 
 func (p position) String() string {
-	return fmt.Sprintf("line %d: column %d", p.line, p.column)
+	return fmt.Sprintf("line %d: column %d", p.Line, p.Column)
 }
 
 type lexMe interface {

@@ -32,40 +32,40 @@ func (singleLineCommentLexer) accept(s scanner) bool {
 func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
-		start, end = ctx.lastToken.end, start
+		start, end = ctx.lastToken.End, start
 	}
 	n, w, err := s.next()
 	if err != nil {
 		return nil, err
 	}
-	end.column += w
+	end.Column += w
 	if n == '/' {
 		nx, w, err := s.next()
 		if err != nil {
 			return nil, err
 		}
-		end.column += w
+		end.Column += w
 		if nx == '/' {
 			var b bytes.Buffer
-			tk := &token{kind: comment}
+			tk := &token{Kind: SingleLineComment}
 			for {
 				x, w, err := s.next()
 				if err != nil {
 					if err == io.EOF {
-						tk.text = b.String()
-						tk.start = start
-						tk.end = end
+						tk.Text = b.String()
+						tk.Start = start
+						tk.End = end
 						return tk, nil
 					}
 					return nil, err
 				}
 				if isLineTerminator(x) {
-					tk.text = b.String()
-					tk.start = start
-					tk.end = end
+					tk.Text = b.String()
+					tk.Start = start
+					tk.End = end
 					return tk, nil
 				}
-				end.column += w
+				end.Column += w
 				b.WriteRune(x)
 			}
 		}

@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 type caseFixture struct {
@@ -61,4 +62,28 @@ func cases(dir string) ([]caseFixture, error) {
 		c = append(c, v)
 	}
 	return c, nil
+}
+
+const expectTokenDecode = `{
+	"Text": " single line comment",
+	"Kind": "SINGLE_LINE_COMMENT",
+	"Start": {
+		"Line": 0,
+		"Column": 0
+	},
+	"End": {
+		"Line": 0,
+		"Column": 22
+	}
+}`
+
+func TestTokenUnmarshalJSON(t *testing.T) {
+	tk, err := decodeToken([]byte(expectTokenDecode))
+	if err != nil {
+		t.Fatal(err)
+	}
+	e := string(printToken(tk))
+	if e != expectTokenDecode {
+		t.Errorf("expected %s got %s", expectTokenDecode, e)
+	}
 }

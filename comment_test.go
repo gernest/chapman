@@ -1,7 +1,6 @@
 package goes
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -21,7 +20,7 @@ func TestSingleLineComment(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		nv := fmt.Sprint(tk)
+		nv := string(printToken(tk))
 		if nv != v.expected {
 			t.Errorf("expected %s got %s", v.expected, nv)
 		}
