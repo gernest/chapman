@@ -24,6 +24,7 @@ func TestSingleLineComment(t *testing.T) {
 		if nv != v.expected {
 			t.Errorf("expected %s got %s", v.expected, nv)
 		}
+		// ioutil.WriteFile(filepath.Join(v.dir, "expect"), []byte(nv), 0600)
 	}
 }
 

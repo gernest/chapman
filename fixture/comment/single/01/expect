@@ -1,5 +1,5 @@
 {
-	"Text": " single line comment",
+	"Text": "// single line comment",
 	"Kind": "SINGLE_LINE_COMMENT",
 	"Start": {
 		"Line": 0,

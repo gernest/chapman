@@ -48,6 +48,7 @@ func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 		if nx == '/' {
 			var b bytes.Buffer
 			tk := &token{Kind: SingleLineComment}
+			b.WriteString("//")
 			for {
 				x, w, err := s.next()
 				if err != nil {
