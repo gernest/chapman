@@ -191,19 +191,6 @@ func (b *bufioScanner) peekAt(n int) (ch rune, size int, err error) {
 	return
 }
 
-func (b *bufioScanner) rewind() error {
-	return b.src.UnreadRune()
-}
-
-func (b *bufioScanner) rewindN(n int) error {
-	for i := 0; i < n; i++ {
-		if err := b.rewind(); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 type context struct {
 	lexers    map[string]lexMe
 	lastToken *token
