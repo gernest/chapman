@@ -33,11 +33,21 @@ func (t *token) String() string {
 	return fmt.Sprintf("<%s start(%v): end(%s)>", t.kind.String(), t.start, t.end)
 }
 
+// lexical token types
 const (
 	comment kind = iota
 	eof
 
 	lineTerminator
+
+	whiteSpace
+	TAB    // CHARACTER TABULATION
+	VT     //LINE TABULATION
+	FF     //FORM FEED (FF)
+	SP     //SPACE
+	NBSP   //NO-BREAK SPACE
+	ZWNBSP // ZERO WIDTH NO-BREAK SPACE
+	USP    //Any other Unicode “Separator, space” code poin
 )
 
 type scanner interface {

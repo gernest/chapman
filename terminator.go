@@ -18,7 +18,7 @@ func (terminatorLexer) accept(s scanner) bool {
 
 func isLineTerminator(ch rune) bool {
 	switch ch {
-	case 0x00A, 0x000D, 0x02028, 0x2029:
+	case 0x0000A, 0x000D, 0x02028, 0x2029:
 		return true
 	default:
 		return false
