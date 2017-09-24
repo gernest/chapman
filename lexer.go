@@ -35,10 +35,14 @@ func (t *token) String() string {
 
 // lexical token types
 const (
-	comment kind = iota
-	eof
+	eof kind = iota
+	comment
 
 	lineTerminator
+	LF //LINE FEED
+	CR //CARRIAGE RETURN
+	LS //LINE SEPARATOR
+	PS //PARAGRAPH SEPARATOR
 
 	whiteSpace
 	TAB    // CHARACTER TABULATION

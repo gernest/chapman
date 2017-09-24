@@ -37,11 +37,22 @@ func (t terminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	if isLineTerminator(n) {
 		end.line++
 		end.column = 0
-		return &token{
+		tk := &token{
 			kind:  lineTerminator,
 			text:  string(n),
 			start: start,
-			end:   end}, nil
+			end:   end}
+		switch n {
+		case 0x0000A:
+			tk.kind = LF
+		case 0x000D:
+			tk.kind = CR
+		case 0x02028:
+			tk.kind = LS
+		case 0x2029:
+			tk.kind = PS
+		}
+		return tk, nil
 	}
 	return nil, fmt.Errorf(unexpectedTkn, t.name(), end)
 }
