@@ -1,0 +1,12 @@
+{
+	"Text": "/* comment on the same line */",
+	"Kind": "MULTI_LINE_COMMENT",
+	"Start": {
+		"Line": 0,
+		"Column": 0
+	},
+	"End": {
+		"Line": 0,
+		"Column": 30
+	}
+}
