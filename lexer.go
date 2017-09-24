@@ -7,7 +7,7 @@ import (
 	"unicode/utf8"
 )
 
-const unexpectedTkn = `%s : unexpected token at [post] expected %s found %s`
+const unexpectedTkn = `%s : unexpected token at %v`
 
 type kind uint
 
@@ -23,15 +23,14 @@ func (k kind) String() string {
 }
 
 type token struct {
-	pos    int
-	offset int
-	text   string
-	line   int
-	kind   kind
+	text  string
+	kind  kind
+	start position
+	end   position
 }
 
 func (t *token) String() string {
-	return fmt.Sprintf(" <%s>", t.kind.String())
+	return fmt.Sprintf("<%s start(%v): end(%s)>", t.kind.String(), t.start, t.end)
 }
 
 const (
@@ -51,6 +50,9 @@ type bufioScanner struct {
 	src *bufio.Reader
 }
 
+func newBufioScanner(r io.Reader) *bufioScanner {
+	return &bufioScanner{src: bufio.NewReader(r)}
+}
 func (b *bufioScanner) next() (rune, int, error) {
 	return b.src.ReadRune()
 }
@@ -88,7 +90,17 @@ func (b *bufioScanner) rewindN(n int) error {
 }
 
 type context struct {
-	lexers map[string]lexMe
+	lexers    map[string]lexMe
+	lastToken *token
+}
+
+type position struct {
+	line   int
+	column int
+}
+
+func (p position) String() string {
+	return fmt.Sprintf("line %d: column %d", p.line, p.column)
 }
 
 type lexMe interface {
@@ -122,6 +134,7 @@ func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 			return tokens, err
 		}
 		tokens = append(tokens, tk)
+		ctx.lastToken = tk
 	}
 	return tokens, nil
 }

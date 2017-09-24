@@ -6,13 +6,13 @@ import (
 	"io"
 )
 
-type commentLexer struct{}
+type singleLineCommentLexer struct{}
 
-func (commentLexer) name() string {
-	return "comment"
+func (singleLineCommentLexer) name() string {
+	return "singleLineComment"
 }
 
-func (commentLexer) accept(s scanner) bool {
+func (singleLineCommentLexer) accept(s scanner) bool {
 	n, _, err := s.peekAt(1)
 	if err != nil {
 		return false
@@ -23,46 +23,52 @@ func (commentLexer) accept(s scanner) bool {
 			return false
 		}
 		if nx == '/' {
-			fmt.Println("is a comment")
 			return true
 		}
 	}
 	return false
 }
 
-func (c commentLexer) lex(s scanner, ctx *context) (*token, error) {
-	n, _, err := s.next()
+func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
+	var start, end position
+	if ctx.lastToken != nil {
+		start, end = ctx.lastToken.end, start
+	}
+	n, w, err := s.next()
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("first", string(n))
+	end.column += w
 	if n == '/' {
-		nx, _, err := s.next()
+		nx, w, err := s.next()
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println("second", string(nx))
+		end.column += w
 		if nx == '/' {
 			var b bytes.Buffer
 			tk := &token{kind: comment}
 			for {
-				x, _, err := s.next()
+				x, w, err := s.next()
 				if err != nil {
 					if err == io.EOF {
 						tk.text = b.String()
+						tk.start = start
+						tk.end = end
 						return tk, nil
 					}
 					return nil, err
 				}
 				if isLineTerminator(x) {
-					s.rewind()
 					tk.text = b.String()
+					tk.start = start
+					tk.end = end
 					return tk, nil
 				}
+				end.column += w
 				b.WriteRune(x)
 			}
 		}
-		return nil, fmt.Errorf(unexpectedTkn, c.name(), "/", string(nx))
 	}
-	return nil, fmt.Errorf(unexpectedTkn, c.name(), "/", string(n))
+	return nil, fmt.Errorf(unexpectedTkn, c.name(), end)
 }

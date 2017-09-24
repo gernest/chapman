@@ -26,12 +26,22 @@ func isLineTerminator(ch rune) bool {
 }
 
 func (t terminatorLexer) lex(s scanner, ctx *context) (*token, error) {
+	var start, end position
+	if ctx.lastToken != nil {
+		start, end = ctx.lastToken.end, start
+	}
 	n, _, err := s.next()
 	if err != nil {
 		return nil, err
 	}
 	if isLineTerminator(n) {
-		return &token{kind: lineTerminator, text: string(n)}, nil
+		end.line++
+		end.column = 0
+		return &token{
+			kind:  lineTerminator,
+			text:  string(n),
+			start: start,
+			end:   end}, nil
 	}
-	return nil, fmt.Errorf(unexpectedTkn, t.name(), "line terminator", string(n))
+	return nil, fmt.Errorf(unexpectedTkn, t.name(), end)
 }
