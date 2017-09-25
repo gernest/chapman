@@ -24,7 +24,7 @@ func (identifierNameLexer) accept(s scanner) bool {
 
 func escapeSequence(ch rune, s scanner) bool {
 	if ch == reverseSolidus {
-		n, _, err := s.peek()
+		n, _, err := s.peekAt(2)
 		if err != nil {
 			return false
 		}
@@ -40,17 +40,15 @@ func (i identifierNameLexer) lex(s scanner, ctx *context) (*token, error) {
 	}
 	var b bytes.Buffer
 	tk := &token{Kind: IdentifierName, Start: start}
-	for i.accept(s) {
-		e, err := i.lexStart(s, ctx, end, &b)
-		if err != nil {
-			return nil, err
-		}
-		e, err = i.lexPart(s, ctx, *e, &b)
-		if err != nil {
-			return nil, err
-		}
-		end = *e
+	e, err := i.lexStart(s, ctx, end, &b)
+	if err != nil {
+		return nil, err
 	}
+	e, err = i.lexPart(s, ctx, *e, &b)
+	if err != nil {
+		return nil, err
+	}
+	end = *e
 	tk.End = end
 	tk.Text = b.String()
 	return tk, nil
@@ -65,6 +63,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 	if isUnicodeIDStart(n) || n == '$' || n == '_' {
 		b.WriteRune(n)
 	} else if n == reverseSolidus {
+		b.WriteRune(n)
 		nx, w, err := s.next()
 		if err != nil {
 			return nil, err
@@ -117,21 +116,25 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 	return &end, nil
 }
 func (i identifierNameLexer) lexPart(s scanner, ctx *context, end position, b *bytes.Buffer) (*position, error) {
-	if i.accept(s) {
-		return i.lexStart(s, ctx, end, b)
-	}
-	nx, _, err := s.peek()
-	if err != nil {
-		return nil, err
-	}
-	if isUnicodeIDContinue(nx) {
-		nx, w, err := s.next()
-		if err != nil {
-			return nil, err
+	for {
+		if i.accept(s) {
+			e, err := i.lexStart(s, ctx, end, b)
+			if err != nil {
+				return nil, err
+			}
+			end.Column = e.Column
+		} else {
+			nx, w, err := s.peek()
+			if err != nil {
+				return nil, err
+			}
+			if isUnicodeIDContinue(nx) || nx == 0x200C || nx == 0x200D {
+				s.next()
+				end.Column += w
+				b.WriteRune(nx)
+				continue
+			}
+			return &end, nil
 		}
-		end.Column += w
-		b.WriteRune(nx)
-		return &end, nil
 	}
-	return &end, nil
 }
