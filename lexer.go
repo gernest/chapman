@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"unicode"
 	"unicode/utf8"
 )
 
@@ -61,6 +62,13 @@ const (
 	NBSP   //NO-BREAK SPACE
 	ZWNBSP // ZERO WIDTH NO-BREAK SPACE
 	USP    //Any other Unicode “Separator, space” code poin
+
+	commonToken
+	IdentifierName
+	Punctuator
+	NumericalLiteral
+	StringLiteralToken
+	Template
 )
 
 func (k kind) String() string {
@@ -93,6 +101,16 @@ func (k kind) String() string {
 		return "ZERO_WIDTH_NO_BREAK_SPACE"
 	case USP:
 		return "OTHER_SPACE"
+	case IdentifierName:
+		return "IDENTIFIER_NAME"
+	case Punctuator:
+		return "PUNCTUATOR"
+	case NumericalLiteral:
+		return "NUMERICAL_LITERAL"
+	case StringLiteralToken:
+		return "STRING_LITERAL_TOKEN"
+	case Template:
+		return "TEMPLATE"
 	default:
 		return "UNKOWN"
 	}
@@ -132,6 +150,16 @@ func getKind(k string) kind {
 		return ZWNBSP
 	case "OTHER_SPACE":
 		return USP
+	case "IDENTIFIER_NAME":
+		return IdentifierName
+	case "PUNCTUATOR":
+		return Punctuator
+	case "NUMERICAL_LITERAL":
+		return NumericalLiteral
+	case "STRING_LITERAL_TOKEN":
+		return StringLiteralToken
+	case "TEMPLATE":
+		return Template
 	default:
 		return Unknown
 	}
@@ -211,6 +239,14 @@ type lexMe interface {
 	lex(scanner, *context) (*token, error)
 }
 
+// make sure all lexers implement lexMe interface
+var (
+	_ lexMe = singleLineCommentLexer{}
+	_ lexMe = multiLineCommentLexer{}
+	_ lexMe = terminatorLexer{}
+	_ lexMe = identifierNameLexer{}
+)
+
 func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 	s := &bufioScanner{bufio.NewReader(src)}
 	ctx := &context{lexers: make(map[string]lexMe)}
@@ -239,4 +275,41 @@ func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 		ctx.lastToken = tk
 	}
 	return tokens, nil
+}
+
+// # Derived Property: ID_Start
+// #  Characters that can start an identifier.
+// #  Generated from:
+// #      Lu + Ll + Lt + Lm + Lo + Nl
+// #    + Other_ID_Start
+// #    - Pattern_Syntax
+// #    - Pattern_White_Space
+// http://unicode.org/reports/tr44/#Simple_Derived
+func isUnicodeIDStart(ch rune) bool {
+	if unicode.In(ch, unicode.Lu, unicode.Ll,
+		unicode.Lt, unicode.Lm, unicode.Lo,
+		unicode.Nl, unicode.Other_ID_Start) {
+		return !unicode.In(ch, unicode.Pattern_Syntax,
+			unicode.Pattern_White_Space)
+	}
+	return false
+}
+
+func isUnicodeIDContinue(ch rune) bool {
+	if isUnicodeIDStart(ch) && unicode.In(ch, unicode.Mn, unicode.Mc,
+		unicode.Nd, unicode.Pc, unicode.Other_ID_Continue) {
+		return !unicode.In(ch, unicode.Pattern_Syntax,
+			unicode.Pattern_White_Space)
+	}
+	return false
+}
+
+func isHexDigit(ch rune) bool {
+	switch ch {
+	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+		'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F':
+		return true
+	default:
+		return false
+	}
 }
