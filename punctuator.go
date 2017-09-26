@@ -2,8 +2,61 @@ package goes
 
 import (
 	"fmt"
-	"unicode"
 )
+
+var puncs = map[string]bool{
+	"{":    true,
+	"(":    true,
+	")":    true,
+	"[":    true,
+	"]":    true,
+	".":    true,
+	"...":  true,
+	";":    true,
+	",":    true,
+	"<":    true,
+	">":    true,
+	"<=":   true,
+	">=":   true,
+	"==":   true,
+	"!=":   true,
+	"===":  true,
+	"!==":  true,
+	"+":    true,
+	"-":    true,
+	"*":    true,
+	"%":    true,
+	"**":   true,
+	"++":   true,
+	"--":   true,
+	"<<":   true,
+	">>":   true,
+	">>>":  true,
+	"&":    true,
+	"|":    true,
+	"^":    true,
+	"!":    true,
+	"~":    true,
+	"&&":   true,
+	"||":   true,
+	"?":    true,
+	":":    true,
+	"=":    true,
+	"+=":   true,
+	"-=":   true,
+	"*=":   true,
+	"%=":   true,
+	"**=":  true,
+	"<<=":  true,
+	">>=":  true,
+	">>>=": true,
+	"&=":   true,
+	"|=":   true,
+	"^=":   true,
+	"=>":   true,
+	"/":    true,
+	"}":    true,
+}
 
 type punctuatorLexer struct{}
 
@@ -16,7 +69,11 @@ func (punctuatorLexer) accept(s scanner) bool {
 	if err != nil {
 		return false
 	}
-	return unicode.IsSymbol(ch)
+	return isPunctuator(string(ch))
+}
+
+func isPunctuator(ch string) bool {
+	return puncs[ch]
 }
 
 func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
@@ -31,12 +88,13 @@ func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	chrs := string(nx)
 	end.Column += w
 	for p.accept(s) {
-		nx, w, err = s.next()
+		nxt, w, err := s.next()
 		if err != nil {
 			return nil, err
 		}
 		end.Column += w
-		chrs += string(nx)
+		chrs += string(nxt)
+		continue
 	}
 	tk := &token{Start: start, Text: chrs, End: end}
 	switch chrs {
