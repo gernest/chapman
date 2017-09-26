@@ -42,19 +42,17 @@ func decodeToken(b []byte) (*token, error) {
 
 // lexical token types
 const (
-	Unknown kind = iota
-	eof
-	comment
+	ILLEGAL kind = iota
+	EOF
+
 	SingleLineComment
 	MultiLineComment
 
-	lineTerminator
 	LF //LINE FEED
 	CR //CARRIAGE RETURN
 	LS //LINE SEPARATOR
 	PS //PARAGRAPH SEPARATOR
 
-	whiteSpace
 	TAB    // CHARACTER TABULATION
 	VT     //LINE TABULATION
 	FF     //FORM FEED (FF)
@@ -63,57 +61,154 @@ const (
 	ZWNBSP // ZERO WIDTH NO-BREAK SPACE
 	USP    //Any other Unicode “Separator, space” code poin
 
-	commonToken
 	IdentifierName
-	Punctuator
+
+	punctuator
+	ADD // +
+	SUB // -
+	MUL // *
+	QUO // /
+	REM // %
+
+	AND    // &
+	OR     // |
+	XOR    // ^
+	SHL    // <<
+	SHR    // >>
+	AndNot // &^
+
+	AddAssign // +=
+	SubAssign // -=
+	MulAssign // *=
+	QuoAssign // /=
+	RemAssign // %=
+
+	AndAssign    // &=
+	OrAssign     // |=
+	XorAssign    // ^=
+	SHLAssign    // <<=
+	SHRAssign    // >>=
+	AndNotAssign // &^=
+
+	LAND // &&
+	LOR  // ||
+	INC  // ++
+	DEC  // --
+	EXP  //**
+
+	EQL    // ==
+	LSS    // <
+	GTR    // >
+	ASSIGN // =
+	NOT    // !
+	SEQL   // ===
+
+	NEQ      // !=
+	SNEQ     //!===
+	QUOEQ    // /=
+	LEQ      // <=
+	GEQ      // >=
+	ELLIPSIS // ...
+
+	LPAREN // (
+	LBRACK // [
+	LBRACE // {
+	COMMA  // ,
+	PERIOD // .
+
+	RPAREN    // )
+	RBRACK    // ]
+	RBRACE    // }
+	SEMICOLON // ;
+	COLON     // :
+
 	NumericalLiteral
 	StringLiteralToken
 	Template
 )
 
-func (k kind) String() string {
-	switch k {
-	case SingleLineComment:
-		return "SINGLE_LINE_COMMENT"
-	case MultiLineComment:
-		return "MULTI_LINE_COMMENT"
-	case eof:
-		return "EOF"
-	case LF:
-		return "LINE_FEED"
-	case CR:
-		return "CARRIAGE_RETURN"
-	case LS:
-		return "LINE_SEPARATOR"
-	case PS:
-		return "PARAGRAPH_SEPARATOR"
-	case TAB:
-		return "CHARACTER_TABULATION"
-	case VT:
-		return "LINE_TABULATION"
-	case FF:
-		return "FORM_FEED"
-	case SP:
-		return "SPACE"
-	case NBSP:
-		return "NO_BREAK_SPACE"
-	case ZWNBSP:
-		return "ZERO_WIDTH_NO_BREAK_SPACE"
-	case USP:
-		return "OTHER_SPACE"
-	case IdentifierName:
-		return "IDENTIFIER_NAME"
-	case Punctuator:
-		return "PUNCTUATOR"
-	case NumericalLiteral:
-		return "NUMERICAL_LITERAL"
-	case StringLiteralToken:
-		return "STRING_LITERAL_TOKEN"
-	case Template:
-		return "TEMPLATE"
-	default:
-		return "UNKOWN"
+var kindMap = map[kind]string{
+	ILLEGAL:            "ILLEGAL",
+	SingleLineComment:  "SINGLE_LINE_COMMENT",
+	MultiLineComment:   "MULTI_LINE_COMMENT",
+	EOF:                "EOF",
+	LF:                 "LINE_FEED",
+	CR:                 "CARRIAGE_RETURN",
+	LS:                 "LINE_SEPARATOR",
+	PS:                 "PARAGRAPH_SEPARATOR",
+	TAB:                "CHARACTER_TABULATION",
+	VT:                 "LINE_TABULATION",
+	FF:                 "FORM_FEED",
+	SP:                 "SPACE",
+	NBSP:               "NO_BREAK_SPACE",
+	ZWNBSP:             "ZERO_WIDTH_NO_BREAK_SPACE",
+	USP:                "OTHER_SPACE",
+	IdentifierName:     "IDENTIFIER_NAME",
+	NumericalLiteral:   "NUMERICAL_LITERAL",
+	StringLiteralToken: "STRING_LITERAL_TOKEN",
+	Template:           "TEMPLATE",
+	ADD:                "ADD",
+	SUB:                "SUB",
+	MUL:                "MULTIPLY",
+	QUO:                "QUOTIENT",
+	REM:                "REMAINDER",
+	AND:                "AND",
+	OR:                 "OR",
+	XOR:                "XOR",
+	SHL:                "LEFT_SHIFT",
+	SHR:                "RIGHT_SHIFT",
+	AndNot:             "AND_NOT",
+	AddAssign:          "ADD_ASSIGN",
+	SubAssign:          "SUB_ASSING",
+	MulAssign:          "MUL_ASSIGN",
+	QuoAssign:          "QUO_ASSIGN",
+	RemAssign:          "REM_ASSIGN",
+	AndAssign:          "AND_ASSIGN",
+	OrAssign:           "OR_ASSIGN",
+	XorAssign:          "XOR_ASSIGN",
+	SHLAssign:          "LEFT_SHIFT_ASSIGN",
+	SHRAssign:          "RIGHT_SHIFT_ASSIGN",
+	AndNotAssign:       "AND_NOT_ASSIGN",
+	LAND:               "LOGICAL_AND",
+	LOR:                "LOGICAL_OR",
+	INC:                "INCREMENT",
+	DEC:                "DECREMENT",
+	EXP:                "EXPONENT",
+	EQL:                "EQUAL",
+	LSS:                "LESS_THAN",
+	GTR:                "GREATER_THAN",
+	ASSIGN:             "ASSIGN",
+	NOT:                "NOT",
+	SEQL:               "STRICT_EQUAL",
+	NEQ:                "NOT_EQUAL",
+	SNEQ:               "STRICT_NOT_EQUAL",
+	QUOEQ:              "QUOTIENT_ASSIGN",
+	LEQ:                "LESS_THAN_OR_EQUAL",
+	GEQ:                "GREATER_THAN_OR_EQUAL",
+	ELLIPSIS:           "ELLIPSIS",
+	LPAREN:             "LEFT_PAREN",
+	LBRACK:             "LEFT_BRACKET",
+	LBRACE:             "LEFT_BRACE",
+	COMMA:              "COMMA",
+	PERIOD:             "PERIOD",
+	RPAREN:             "RIGHT_PAREN",
+	RBRACK:             "RIGHT_BRACKET",
+	RBRACE:             "RIGHT_BRACE",
+	SEMICOLON:          "SEMICOLON",
+	COLON:              "COLON",
+}
+
+var reverseKindMap map[string]kind
+
+func init() {
+	reverseKindMap = make(map[string]kind)
+	for k, v := range kindMap {
+		reverseKindMap[v] = k
 	}
+}
+
+func (k kind) String() string {
+	return kindMap[k]
 }
 
 func (k kind) MarshalJSON() ([]byte, error) {
@@ -121,48 +216,7 @@ func (k kind) MarshalJSON() ([]byte, error) {
 }
 
 func getKind(k string) kind {
-	switch k {
-	case "SINGLE_LINE_COMMENT":
-		return SingleLineComment
-	case "MULTI_LINE_COMMENT":
-		return MultiLineComment
-	case "EOF":
-		return eof
-	case "LINE_FEED":
-		return LF
-	case "CARRIAGE_RETURN":
-		return CR
-	case "LINE_SEPARATOR":
-		return LS
-	case "PARAGRAPH_SEPARATOR":
-		return PS
-	case "CHARACTER_TABULATION":
-		return TAB
-	case "LINE_TABULATION":
-		return VT
-	case "FORM_FEED":
-		return FF
-	case "SPACE":
-		return SP
-	case "NO_BREAK_SPACE":
-		return NBSP
-	case "ZERO_WIDTH_NO_BREAK_SPACE":
-		return ZWNBSP
-	case "OTHER_SPACE":
-		return USP
-	case "IDENTIFIER_NAME":
-		return IdentifierName
-	case "PUNCTUATOR":
-		return Punctuator
-	case "NUMERICAL_LITERAL":
-		return NumericalLiteral
-	case "STRING_LITERAL_TOKEN":
-		return StringLiteralToken
-	case "TEMPLATE":
-		return Template
-	default:
-		return Unknown
-	}
+	return reverseKindMap[k]
 }
 
 type scanner interface {
