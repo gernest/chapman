@@ -312,6 +312,7 @@ var (
 	_ lexMe = multiLineCommentLexer{}
 	_ lexMe = terminatorLexer{}
 	_ lexMe = identifierNameLexer{}
+	_ lexMe = punctuatorLexer{}
 )
 
 func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
