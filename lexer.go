@@ -75,6 +75,7 @@ const (
 	XOR    // ^
 	SHL    // <<
 	SHR    // >>
+	USHR   // >>>
 	AndNot // &^
 
 	AddAssign // +=
@@ -82,12 +83,14 @@ const (
 	MulAssign // *=
 	QuoAssign // /=
 	RemAssign // %=
+	ExpAssign //**=
 
 	AndAssign    // &=
 	OrAssign     // |=
 	XorAssign    // ^=
 	SHLAssign    // <<=
 	SHRAssign    // >>=
+	USHRAssign   // >>>=
 	AndNotAssign // &^=
 
 	LAND // &&
@@ -121,6 +124,10 @@ const (
 	RBRACE    // }
 	SEMICOLON // ;
 	COLON     // :
+
+	QN    // ?
+	TILDE //~
+	ARROW // =>
 
 	NumericalLiteral
 	StringLiteralToken
@@ -157,17 +164,20 @@ var kindMap = map[kind]string{
 	XOR:                "XOR",
 	SHL:                "LEFT_SHIFT",
 	SHR:                "RIGHT_SHIFT",
+	USHR:               "UNSIGNED_RIGHT_SHIFT",
 	AndNot:             "AND_NOT",
 	AddAssign:          "ADD_ASSIGN",
 	SubAssign:          "SUB_ASSING",
 	MulAssign:          "MUL_ASSIGN",
 	QuoAssign:          "QUO_ASSIGN",
 	RemAssign:          "REM_ASSIGN",
+	ExpAssign:          "EXPONENT_ASSIGN",
 	AndAssign:          "AND_ASSIGN",
 	OrAssign:           "OR_ASSIGN",
 	XorAssign:          "XOR_ASSIGN",
 	SHLAssign:          "LEFT_SHIFT_ASSIGN",
 	SHRAssign:          "RIGHT_SHIFT_ASSIGN",
+	USHRAssign:         "UNSIGNED_RIGHT_SHIFT_ASSIGN",
 	AndNotAssign:       "AND_NOT_ASSIGN",
 	LAND:               "LOGICAL_AND",
 	LOR:                "LOGICAL_OR",
@@ -196,6 +206,9 @@ var kindMap = map[kind]string{
 	RBRACE:             "RIGHT_BRACE",
 	SEMICOLON:          "SEMICOLON",
 	COLON:              "COLON",
+	QN:                 "QUESTION_MARK",
+	TILDE:              "TILDE",
+	ARROW:              "ARROW",
 }
 
 var reverseKindMap map[string]kind

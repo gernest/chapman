@@ -38,7 +38,6 @@ func (t terminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 		end.Line++
 		end.Column = 0
 		tk := &token{
-			Kind:  lineTerminator,
 			Text:  string(n),
 			Start: start,
 			End:   end}
