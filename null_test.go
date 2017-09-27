@@ -7,7 +7,7 @@ import (
 
 func TestNullLexer(t *testing.T) {
 	var l nullLexer
-	sample := []string{"null", "null "}
+	sample := []string{"null"}
 	for _, v := range sample {
 		s := newBufioScanner(strings.NewReader(v))
 		if !l.accept(s) {

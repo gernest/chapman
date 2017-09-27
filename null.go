@@ -26,7 +26,6 @@ func (nullLexer) accept(s scanner) bool {
 			}
 			b.WriteRune(n)
 		}
-		fmt.Println(&b)
 		return b.String() == "null"
 	}
 	return false
