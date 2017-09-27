@@ -133,7 +133,9 @@ const (
 	StringLiteralToken
 	Template
 
-	NULL // null
+	NULL  // null
+	TRUE  // true
+	FALSE //false
 )
 
 var kindMap = map[kind]string{

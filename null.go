@@ -16,8 +16,8 @@ func (nullLexer) accept(s scanner) bool {
 	if err != nil {
 		return false
 	}
-	var b bytes.Buffer
 	if n == 'n' {
+		var b bytes.Buffer
 		b.WriteRune(n)
 		for i := 2; i < 5; i++ {
 			n, _, err := s.peekAt(i)
