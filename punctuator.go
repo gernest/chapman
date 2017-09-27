@@ -94,7 +94,6 @@ func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
 		}
 		end.Column += w
 		chrs += string(nxt)
-		continue
 	}
 	tk := &token{Start: start, Text: chrs, End: end}
 	switch chrs {
