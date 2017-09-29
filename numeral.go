@@ -1,4 +1,4 @@
-package goes
+package chapman
 
 import (
 	"fmt"
@@ -15,7 +15,18 @@ func (numeralLexer) accept(s scanner) bool {
 	if err != nil {
 		return false
 	}
-	return isDecimalDigit(ch)
+	return isDecimalDigit(ch) || isFloat(s, ch)
+}
+
+func isFloat(s scanner, ch rune) bool {
+	if ch != '.' {
+		return false
+	}
+	p, _, err := s.peekAt(2)
+	if err != nil {
+		return false
+	}
+	return isDecimalDigit(p)
 }
 
 func isDecimalDigit(ch rune) bool {
@@ -147,11 +158,11 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		}
 	}
 	if isNonZeroDigit(nx) {
-		txt, err := digits(n, s, &end, isDecimalDigit)
-		if err != nil {
-			return nil, err
-		}
-		tk.Text += txt
+		// txt, err := digits(n, s, &end, isDecimalDigit)
+		// if err != nil {
+		// 	return nil, err
+		// }
+		// tk.Text += txt
 
 	}
 	return nil, fmt.Errorf(unexpectedTkn, n.name(), end)

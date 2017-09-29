@@ -1,4 +1,4 @@
-package goes
+package chapman
 
 var keywords = []string{
 	"await",
