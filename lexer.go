@@ -136,6 +136,11 @@ const (
 	NULL  // null
 	TRUE  // true
 	FALSE //false
+
+	INT //integer
+	BINARY
+	OCTAL
+	FLOAT
 )
 
 var kindMap = map[kind]string{
@@ -241,6 +246,7 @@ type scanner interface {
 	next() (rune, int, error)
 	peek() (rune, int, error)
 	peekAt(n int) (rune, int, error)
+	rewind() error
 }
 
 type bufioScanner struct {
@@ -270,6 +276,10 @@ func (b *bufioScanner) peekAt(n int) (ch rune, size int, err error) {
 		width += size
 	}
 	return
+}
+
+func (b *bufioScanner) rewind() error {
+	return b.src.UnreadRune()
 }
 
 func (b *bufioScanner) peekChunck(n int) ([]byte, error) {
@@ -363,14 +373,4 @@ func isUnicodeIDContinue(ch rune) bool {
 			unicode.Pattern_White_Space)
 	}
 	return false
-}
-
-func isHexDigit(ch rune) bool {
-	switch ch {
-	case '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-		'a', 'b', 'c', 'd', 'e', 'f', 'A', 'B', 'C', 'D', 'E', 'F':
-		return true
-	default:
-		return false
-	}
 }
