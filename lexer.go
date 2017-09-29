@@ -303,6 +303,9 @@ var (
 	_ lexMe = terminatorLexer{}
 	_ lexMe = identifierNameLexer{}
 	_ lexMe = punctuatorLexer{}
+	_ lexMe = boolLexer{}
+	_ lexMe = nullLexer{}
+	_ lexMe = numeralLexer{}
 )
 
 func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
