@@ -156,7 +156,54 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					}
 				}
 				if isHexDigit(ch) {
-					tk.Kind = HEX
+					tk.Text += string(ch)
+					end.Column += w
+					continue
+				}
+				if isTokenSep(ch) {
+					s.rewind()
+					break
+				}
+				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+			}
+			return tk, nil
+		}
+		if nx == '0' && nxt == 'b' || nxt == 'B' {
+			tk.Kind = BINARY
+			for {
+				ch, w, err := s.next()
+				if err != nil {
+					if err == io.EOF {
+						break
+					} else {
+						return nil, err
+					}
+				}
+				if isBinaryDigit(ch) {
+					tk.Text += string(ch)
+					end.Column += w
+					continue
+				}
+				if isTokenSep(ch) {
+					s.rewind()
+					break
+				}
+				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+			}
+			return tk, nil
+		}
+		if nx == '0' && nxt == 'o' || nxt == 'O' {
+			tk.Kind = OCTAL
+			for {
+				ch, w, err := s.next()
+				if err != nil {
+					if err == io.EOF {
+						break
+					} else {
+						return nil, err
+					}
+				}
+				if isOctalDigit(ch) {
 					tk.Text += string(ch)
 					end.Column += w
 					continue
