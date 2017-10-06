@@ -141,6 +141,7 @@ const (
 	BINARY
 	OCTAL
 	FLOAT
+	HEX
 )
 
 var kindMap = map[kind]string{

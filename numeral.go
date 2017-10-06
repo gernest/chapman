@@ -144,6 +144,31 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 				return tk, nil
 			}
 		}
+		if nx == '0' && nxt == 'x' || nxt == 'X' {
+			tk.Kind = HEX
+			for {
+				ch, w, err := s.next()
+				if err != nil {
+					if err == io.EOF {
+						break
+					} else {
+						return nil, err
+					}
+				}
+				if isHexDigit(ch) {
+					tk.Kind = HEX
+					tk.Text += string(ch)
+					end.Column += w
+					continue
+				}
+				if isTokenSep(ch) {
+					s.rewind()
+					break
+				}
+				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+			}
+			return tk, nil
+		}
 		if isDecimalDigit(nxt) {
 			tk.Kind = INT
 			for {
