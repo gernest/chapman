@@ -186,12 +186,3 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 
 	return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
 }
-
-func nextSeparator(s scanner) bool {
-	ch, _, err := s.peek()
-	fmt.Println("HERE ", err, string(ch))
-	if err != nil {
-		return err == io.EOF
-	}
-	return isTokenSep(ch)
-}
