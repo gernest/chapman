@@ -10,6 +10,7 @@ type numeralLexer struct{}
 func (numeralLexer) name() string {
 	return "numeral"
 }
+
 func (numeralLexer) accept(s scanner) bool {
 	ch, _, err := s.peek()
 	if err != nil {
@@ -79,93 +80,120 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 	if err != nil {
 		return nil, err
 	}
-	end.Column += w
-	tk := &token{Start: start, Text: string(nx)}
-	if nx == '0' {
+	if isDecimalDigit(nx) || isFloat(s, nx) {
+		end.Column += w
+		tk := &token{Start: start, Text: string(nx)}
 		nxt, w, err := s.next()
 		if err != nil {
 			if err == io.EOF {
-				//decimal
-				tk.End = end
 				tk.Kind = INT
 				return tk, nil
 			}
 			return nil, err
 		}
-		if isLineTerminator(nxt) || isWhiteSpace(nxt) {
-			if err := s.rewind(); err != nil {
-				return nil, err
-			}
+		if isTokenSep(nxt) {
+			s.rewind()
 			tk.Kind = INT
-			tk.End = end
 			return tk, nil
 		}
 		end.Column += w
 		tk.Text += string(nxt)
-		switch nxt {
-		case 'b', 'B': //binary
-			txt, err := digits(n, s, &end, isBinaryDigit)
-			if err != nil {
-				return nil, err
-			}
-			tk.Text += txt
-			tk.End = end
-			tk.Kind = BINARY
-			return tk, nil
-		case 'o', 'O':
-			txt, err := digits(n, s, &end, isOctalDigit)
-			if err != nil {
-				return nil, err
-			}
-			tk.Text += txt
-			tk.End = end
-			tk.Kind = OCTAL
-			return tk, nil
 
-		case 'x', 'X': //hexadecimal
-			txt, err := digits(n, s, &end, isHexDigit)
+		if nxt == '.' {
+			ch, w, err := s.next()
 			if err != nil {
 				return nil, err
 			}
-			tk.Text += txt
-			tk.End = end
-			tk.Kind = OCTAL
-			return tk, nil
-		case '.':
-			p, _, err := s.peek()
-			if err != nil {
-				return nil, err
-			}
-			if isDecimalDigit(p) {
-				txt, err := digits(n, s, &end, isDecimalDigit)
-				if err != nil {
-					return nil, err
+			if isDecimalDigit(ch) {
+				tk.Kind = FLOAT
+				end.Column += w
+				tk.Text += string(ch)
+				for {
+					ch, w, err = s.next()
+					if err != nil {
+						if err == io.EOF {
+							break
+						} else {
+							return nil, err
+						}
+					}
+					if isDecimalDigit(ch) {
+						end.Column += w
+						tk.Text += string(ch)
+						continue
+					}
+					if ch == 'e' || ch == 'E' {
+						tk.Text += string(ch)
+						end.Column += w
+						ch, w, err = s.next()
+						if err != nil {
+							return nil, err
+						}
+						if isDecimalDigit(ch) || ch == '+' || ch == '-' {
+							tk.Text += string(ch)
+							end.Column += w
+							continue
+						}
+						return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+					}
+					if isTokenSep(ch) {
+						break
+					}
+					return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
 				}
-				tk.Text += txt
+				return tk, nil
 			}
-			if p == 'e' {
-				txt, err := n.exponent(s, &end)
-				if err != nil {
-					return nil, err
-				}
-				tk.Text += txt
-			}
-			tk.Kind = FLOAT
-			tk.End = end
-			return tk, nil
-		default:
-			return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
 		}
-	}
-	if isNonZeroDigit(nx) {
-		// txt, err := digits(n, s, &end, isDecimalDigit)
-		// if err != nil {
-		// 	return nil, err
-		// }
-		// tk.Text += txt
+		if isDecimalDigit(nxt) {
+			tk.Kind = INT
+			for {
+				ch, w, err := s.next()
+				if err != nil {
+					if err == io.EOF {
+						break
+					} else {
+						return nil, err
+					}
+				}
+				if isDecimalDigit(ch) {
+					tk.Text += string(ch)
+					end.Column += w
+					continue
+				}
+				if ch == 'e' || ch == 'E' {
+					tk.Text += string(ch)
+					end.Column += w
+					ch, w, err = s.next()
+					if err != nil {
+						return nil, err
+					}
+					if isDecimalDigit(ch) || ch == '+' || ch == '-' {
+						tk.Text += string(ch)
+						end.Column += w
+						continue
+					}
+					return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+				}
+				if isTokenSep(ch) {
+					break
+				}
+				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+			}
+			return tk, nil
+		}
 
 	}
+
 	return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+}
+
+func nextSeparator(s scanner) bool {
+	ch, _, err := s.peek()
+	fmt.Println("HERE ", err, string(ch))
+	if err != nil {
+		return err == io.EOF
+	}
+	return isTokenSep(ch)
 }
 
 func digits(l lexMe, s scanner, end *position, accCond func(rune) bool) (string, error) {

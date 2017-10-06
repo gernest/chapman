@@ -374,3 +374,11 @@ func isUnicodeIDContinue(ch rune) bool {
 	}
 	return false
 }
+
+func isTokenSep(ch rune) bool {
+	return isWhiteSpace(ch) || isLineTerminator(ch)
+}
+
+func isTokenSepNoTerm(ch rune) bool {
+	return isWhiteSpace(ch)
+}
