@@ -220,6 +220,13 @@ var kindMap = map[kind]string{
 	TILDE:              "TILDE",
 	ARROW:              "ARROW",
 	NULL:               "NULL",
+	TRUE:               "TRUE",
+	FALSE:              "FALSE",
+	INT:                "INT",
+	BINARY:             "BINARY",
+	OCTAL:              "OCTAL",
+	FLOAT:              "FLOAT",
+	HEX:                "HEX",
 }
 
 var reverseKindMap map[string]kind
