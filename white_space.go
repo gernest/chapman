@@ -28,7 +28,7 @@ func isWhiteSpace(ch rune) bool {
 	}
 }
 
-func (w whiteSpaceLexer) lext(s scanner, ctx *context) (*token, error) {
+func (w whiteSpaceLexer) lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start

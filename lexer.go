@@ -30,6 +30,18 @@ func printToken(tk *token) []byte {
 	return b
 }
 
+func printTokens(tks []*token) ([]byte, error) {
+	for i := 0; i < len(tks); i++ {
+		tk := tks[i]
+		tk.RKind = tk.Kind.String()
+	}
+	b, err := json.MarshalIndent(tks, "", "\t")
+	if err != nil {
+		fmt.Println(err)
+	}
+	return b, nil
+}
+
 func decodeToken(b []byte) (*token, error) {
 	t := &token{}
 	err := json.Unmarshal(b, t)
