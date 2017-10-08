@@ -47,12 +47,12 @@ func init() {
 					return err
 				}
 				switch p {
-				case "actual":
+				case "src":
 					e.src = string(b)
 				case "expect":
 					e.expect = string(b)
 				case "desc":
-					e.src = string(b)
+					e.desc = string(b)
 				}
 			}
 			ok[r] = true
