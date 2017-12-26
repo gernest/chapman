@@ -1,10 +1,10 @@
 
 - Lexer 
-  - [ ] Comment
-      - [ ] Single line
-      - [ ] Multiline
-  - [ ] WhiteSpace
-  - [ ] LineTerminator
+  - [x] Comment
+      - [x] Single line
+      - [x] Multiline
+  - [x] WhiteSpace
+  - [x] LineTerminator
   - [ ] CommonToken
       - [ ] IdentifierName
       - [ ] Punctuator
@@ -14,7 +14,7 @@
       - [ ] Literals
           - [ ] NumericalLiteral
           - [ ] StringLiteral
-          - [ ] StringLiteral
+          - [x] StringLiteral
           - [ ] Null Literal
           - [ ] Boolean Literal
           - [ ] Regular Expression Literal

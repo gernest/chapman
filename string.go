@@ -8,6 +8,9 @@ import (
 	"unicode/utf8"
 )
 
+const backSlash = 0x005C
+const singleQuote = 0x2019
+
 type stringLexer struct{}
 
 func (stringLexer) name() string {
@@ -16,11 +19,10 @@ func (stringLexer) name() string {
 
 func isSingleCharacterEscape(ch rune) bool {
 	switch ch {
-	case '"', 'b', 'f', 'n', 'r', 't', 'v':
+	case '"', 'b', 'f', 'n', 'r', 't', 'v', backSlash, singleQuote:
 		return true
 	default:
-		s := string(ch)
-		return s == "'" || s == "\\"
+		return false
 	}
 }
 
@@ -54,6 +56,8 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 	var buf bytes.Buffer
 	buf.WriteRune(ch)
 	if ch == '"' {
+		var gerr error
+	main:
 		for {
 			nx, w, err := s.next()
 			if err != nil {
@@ -68,17 +72,15 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 				tk := &token{Start: start, Text: buf.String(), End: end}
 				return tk, nil
 			}
-			if string(nx) == "\\" {
+			if nx == backSlash {
 				nxt, w, err := s.next()
 				if err != nil {
 					return nil, err
 				}
 				end.Column += w
 				buf.WriteRune(nxt)
-				if isSingleCharacterEscape(nxt) || isNonEscapeChar(nxt) {
-					continue
-				}
-				if nxt == '0' {
+				switch {
+				case nxt == '0':
 					next, w, err := s.next()
 					if err != nil {
 						return nil, err
@@ -88,8 +90,8 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					if !isDecimalDigit(next) {
 						return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
 					}
-				}
-				if nxt == 'x' {
+					continue
+				case nx == 'x':
 					next, w, err := s.next()
 					if err != nil {
 						return nil, err
@@ -100,20 +102,53 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 						return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
 					}
 					continue
-				}
-				if nxt == 'u' {
+				case nxt == 'u':
 					next, w, err := s.next()
 					if err != nil {
 						return nil, err
 					}
 					end.Column += w
 					buf.WriteRune(next)
-					if !isHexDigit(next) || next != '{' {
-						return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+					if isHexDigit(next) {
+						for i := 0; i < 3; i++ {
+							next, w, err = s.next()
+							if err != nil {
+								return nil, err
+							}
+							end.Column += w
+							buf.WriteRune(next)
+							if !isHexDigit(next) {
+								return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+							}
+						}
+						continue
 					}
+					if next == '{' {
+						for {
+							next, w, err = s.next()
+							if err != nil {
+								return nil, err
+							}
+							end.Column += w
+							buf.WriteRune(next)
+							if next == '}' {
+								continue
+							}
+							if !isHexDigit(next) {
+								gerr = fmt.Errorf(unexpectedTkn, sl.name(), end)
+								break main
+							}
+						}
+					}
+				case isSingleCharacterEscape(nxt) || isNonEscapeChar(nxt):
 					continue
+				default:
+					return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
 				}
 			}
+		}
+		if gerr != nil {
+			return nil, gerr
 		}
 	}
 	return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
