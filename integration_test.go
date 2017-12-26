@@ -97,7 +97,7 @@ func runCase(u []unit) func(*testing.T) {
 
 func allLexme() []lexMe {
 	return []lexMe{
-		singleLineCommentLexer{}, multiLineCommentLexer{}, terminatorLexer{},
+		singleLineCommentLexer{}, multiLineCommentLexer{}, lineTerminatorLexer{},
 		whiteSpaceLexer{},
 	}
 }

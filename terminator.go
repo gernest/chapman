@@ -2,13 +2,13 @@ package chapman
 
 import "fmt"
 
-type terminatorLexer struct{}
+type lineTerminatorLexer struct{}
 
-func (terminatorLexer) name() string {
-	return "terminator"
+func (lineTerminatorLexer) name() string {
+	return "LineTerminator"
 }
 
-func (terminatorLexer) accept(s scanner) bool {
+func (lineTerminatorLexer) accept(s scanner) bool {
 	n, _, err := s.peek()
 	if err != nil {
 		return false
@@ -25,7 +25,7 @@ func isLineTerminator(ch rune) bool {
 	}
 }
 
-func (t terminatorLexer) lex(s scanner, ctx *context) (*token, error) {
+func (t lineTerminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -46,6 +46,15 @@ func (t terminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 			tk.Kind = LF
 		case 0x000D:
 			tk.Kind = CR
+			nxt, _, err := s.peek()
+			if err == nil {
+				//http://ecma-international.org/ecma-262/#sec-line-terminators
+				//
+				// Treat <CR><LF> as <CR>.
+				if nxt == 0x0000A {
+					s.next()
+				}
+			}
 		case 0x02028:
 			tk.Kind = LS
 		case 0x2029:

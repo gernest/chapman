@@ -328,7 +328,7 @@ type lexMe interface {
 var (
 	_ lexMe = singleLineCommentLexer{}
 	_ lexMe = multiLineCommentLexer{}
-	_ lexMe = terminatorLexer{}
+	_ lexMe = lineTerminatorLexer{}
 	_ lexMe = identifierNameLexer{}
 	_ lexMe = punctuatorLexer{}
 	_ lexMe = boolLexer{}
