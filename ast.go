@@ -1,5 +1,6 @@
 package chapman
 
+// NodeType is a javascript ast node type.
 type NodeType uint
 
 //common node  types

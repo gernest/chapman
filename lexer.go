@@ -334,6 +334,7 @@ var (
 	_ lexMe = boolLexer{}
 	_ lexMe = nullLexer{}
 	_ lexMe = numeralLexer{}
+	_ lexMe = stringLexer{}
 )
 
 func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
