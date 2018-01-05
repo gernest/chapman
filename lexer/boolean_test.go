@@ -1,13 +1,13 @@
-package chapman
+package lexer
 
 import (
 	"strings"
 	"testing"
 )
 
-func TestNullLexer(t *testing.T) {
-	var l nullLexer
-	sample := []string{"null"}
+func TestBooleanLexer(t *testing.T) {
+	var l boolLexer
+	sample := []string{"true", "false"}
 	for _, v := range sample {
 		s := newBufioScanner(strings.NewReader(v))
 		if !l.accept(s) {

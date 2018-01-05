@@ -1,4 +1,4 @@
-package chapman
+package lexer
 
 import "fmt"
 

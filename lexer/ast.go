@@ -1,4 +1,4 @@
-package chapman
+package lexer
 
 // NodeType is a javascript ast node type.
 type NodeType uint

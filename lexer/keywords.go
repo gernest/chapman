@@ -1,4 +1,4 @@
-package chapman
+package lexer
 
 var keywords = []string{
 	"await",
