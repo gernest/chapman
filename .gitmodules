@@ -1,0 +1,3 @@
+[submodule "esprima"]
+	path = esprima
+	url = git@github.com:jquery/esprima.git
