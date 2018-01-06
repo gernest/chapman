@@ -279,10 +279,7 @@ func (b *bufioScanner) next() (rune, int, error) {
 }
 
 func (b *bufioScanner) peek() (ch rune, size int, err error) {
-	defer func() {
-		err = b.src.UnreadByte()
-	}()
-	return b.src.ReadRune()
+	return b.peekAt(1)
 }
 
 // reads the nth rune without advancing the reader

@@ -3,6 +3,7 @@ package lexer
 import (
 	"bytes"
 	"fmt"
+	"io"
 )
 
 const reverseSolidus = 0x005C // backslash
@@ -126,6 +127,9 @@ func (i identifierNameLexer) lexPart(s scanner, ctx *context, end position, b *b
 		} else {
 			nx, w, err := s.peek()
 			if err != nil {
+				if err == io.EOF {
+					return &end, nil
+				}
 				return nil, err
 			}
 			if isUnicodeIDContinue(nx) || nx == 0x200C || nx == 0x200D {
