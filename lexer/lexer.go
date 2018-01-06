@@ -25,7 +25,7 @@ func newToken(start position) *token {
 	return &token{Start: start}
 }
 
-func (t *token) AddText(txt string) {
+func (t *token) AddRune(txt string) {
 	t.Text += txt
 	t.End.Column += len(txt)
 }
