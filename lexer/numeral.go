@@ -82,7 +82,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 	}
 	tk := newToken(start)
 	if isDecimalDigit(nx) || isFloat(s, nx) {
-		tk.AddRune(string(nx))
+		tk.AddRune(nx)
 		nxt, _, err := s.Peek()
 		if err != nil {
 			if err == io.EOF {
@@ -98,7 +98,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 			return tk, nil
 		case nxt == '.':
 			s.Next()
-			tk.AddRune(string(nxt))
+			tk.AddRune(nxt)
 			ch, _, err := s.Peek()
 			if err != nil {
 				return nil, err
@@ -106,7 +106,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 			switch {
 			case isDecimalDigit(ch):
 				s.Next()
-				tk.AddRune(string(ch))
+				tk.AddRune(ch)
 				for {
 					ch, _, err = s.Peek()
 					if err != nil {
@@ -118,18 +118,18 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 					}
 					if isDecimalDigit(ch) {
 						s.Next()
-						tk.AddRune(string(ch))
+						tk.AddRune(ch)
 						continue
 					}
 					if ch == 'e' || ch == 'E' {
 						s.Next()
-						tk.AddRune(string(ch))
+						tk.AddRune(ch)
 						ch, _, err = s.Next()
 						if err != nil {
 							return nil, err
 						}
 						if isDecimalDigit(ch) || ch == '+' || ch == '-' {
-							tk.AddRune(string(ch))
+							tk.AddRune(ch)
 							continue
 						}
 						return nil, fmt.Errorf(unexpectedTkn, n.Name(), tk.End)
@@ -144,7 +144,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 		case nx == '0' && nxt == 'x' || nx == 0 && nxt == 'X':
 			tk.Kind = HEX
 			s.Next()
-			tk.AddRune(string(nxt))
+			tk.AddRune(nxt)
 			for {
 				ch, _, err := s.Peek()
 				if err != nil {
@@ -156,7 +156,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 				}
 				if isHexDigit(ch) {
 					s.Next()
-					tk.AddRune(string(ch))
+					tk.AddRune(ch)
 					continue
 				}
 				break
@@ -174,7 +174,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 					}
 				}
 				if isBinaryDigit(ch) {
-					tk.AddRune(string(ch))
+					tk.AddRune(ch)
 					continue
 				}
 				if isTokenSep(ch) {
@@ -196,7 +196,7 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 					}
 				}
 				if isOctalDigit(ch) {
-					tk.AddRune(string(ch))
+					tk.AddRune(ch)
 					continue
 				}
 				if isTokenSep(ch) {
@@ -218,17 +218,17 @@ func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 					}
 				}
 				if isDecimalDigit(ch) {
-					tk.AddRune(string(ch))
+					tk.AddRune(ch)
 					continue
 				}
 				if ch == 'e' || ch == 'E' {
-					tk.AddRune(string(ch))
+					tk.AddRune(ch)
 					ch, _, err = s.Next()
 					if err != nil {
 						return nil, err
 					}
 					if isDecimalDigit(ch) || ch == '+' || ch == '-' {
-						tk.AddRune(string(ch))
+						tk.AddRune(ch)
 						continue
 					}
 					return nil, fmt.Errorf(unexpectedTkn, n.Name(), tk.End)

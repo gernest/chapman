@@ -141,7 +141,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 		return nil, err
 	}
 	tk := newToken(start)
-	tk.AddRune(string(nx))
+	tk.AddRune(nx)
 
 	switch nx {
 	case '{':
@@ -176,8 +176,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			switch nxt {
 			case '.':
 				s.Next()
-				tk.AddRune(string(nxt))
-
+				tk.AddRune(nxt)
 				nxt, _, err = s.Next()
 				if err != nil {
 					return nil, err
@@ -185,7 +184,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 				if nxt != '.' {
 					return nil, fmt.Errorf(unexpectedTkn, p.Name(), tk.End)
 				}
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 				tk.Kind = ELLIPSIS
 			}
 		}
@@ -213,7 +212,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '<':
 				s.Next()
 				tk.Kind = SHL
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 
 				if p.Accept(s) {
 					nxt, _, err = s.Next()
@@ -226,7 +225,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 					if nxt == '=' {
 						s.Next()
 						tk.Kind = SHLAssign
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 					}
 				}
 
@@ -234,7 +233,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 				// We advance the cursor since we already read the rune thorugh peek.
 				s.Next()
 				tk.Kind = LEQ
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -253,11 +252,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 				// We advance the cursor since we already read the rune thorugh peek.
 				s.Next()
 				tk.Kind = GEQ
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '>': //>>
 				s.Next()
 				tk.Kind = SHR
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 				if p.Accept(s) {
 					nxt, _, err = s.Peek()
 					if err == io.EOF {
@@ -271,11 +270,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 					case '=': //>>=
 						tk.Kind = SHRAssign
 						s.Next()
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 					case '>': //>>>
 						tk.Kind = USHR
 						s.Next()
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 						if p.Accept(s) {
 							nxt, _, err = s.Peek()
 							if err == io.EOF {
@@ -287,7 +286,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 							if nxt == '=' { ///>>>=
 								s.Next()
 								tk.Kind = USHRAssign
-								tk.AddRune(string(nxt))
+								tk.AddRune(nxt)
 							}
 						}
 					}
@@ -309,11 +308,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '=':
 				s.Next()
 				tk.Kind = AddAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '+':
 				s.Next()
 				tk.Kind = INC
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -331,11 +330,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '-':
 				s.Next()
 				tk.Kind = DEC
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '=':
 				s.Next()
 				tk.Kind = SubAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -353,11 +352,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '=':
 				s.Next()
 				tk.Kind = MulAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '*':
 				s.Next()
 				tk.Kind = EXP
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 
 				if p.Accept(s) {
 					nxt, _, err := s.Peek()
@@ -371,7 +370,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 					case '=':
 						s.Next()
 						tk.Kind = ExpAssign
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 					}
 				}
 			}
@@ -391,7 +390,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '=':
 				s.Next()
 				tk.Kind = RemAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -409,11 +408,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '=':
 				s.Next()
 				tk.Kind = AndAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '&':
 				s.Next()
 				tk.Kind = LAND
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -431,11 +430,11 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '|':
 				s.Next()
 				tk.Kind = LOR
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '=':
 				s.Next()
 				tk.Kind = OrAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -453,7 +452,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '=':
 				s.Next()
 				tk.Kind = XorAssign
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			}
 		}
 		return tk, nil
@@ -469,7 +468,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 				// We advance the cursor since we already read the rune thorugh peek.
 				s.Next()
 				tk.Kind = NEQ
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 				if p.Accept(s) {
 					nxt, _, err = s.Peek()
 					if err == io.EOF {
@@ -481,7 +480,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 					if nxt == '=' {
 						s.Next()
 						tk.Kind = SNEQ
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 					}
 				}
 			}
@@ -510,12 +509,12 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 			case '>':
 				s.Next()
 				tk.Kind = ARROW
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 			case '=':
 				// We advance the cursor since we already read the rune thorugh peek.
 				s.Next()
 				tk.Kind = EQL
-				tk.AddRune(string(nxt))
+				tk.AddRune(nxt)
 				if p.Accept(s) {
 					nxt, _, err = s.Peek()
 					if err == io.EOF {
@@ -527,7 +526,7 @@ func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 					if nxt == '=' {
 						s.Next()
 						tk.Kind = SEQL
-						tk.AddRune(string(nxt))
+						tk.AddRune(nxt)
 					}
 				}
 			}
