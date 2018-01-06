@@ -36,7 +36,7 @@ func isEscapeChar(ch rune) bool {
 }
 
 func (stringLexer) accept(s scanner) bool {
-	ch, _, er := s.peek()
+	ch, _, er := s.Peek()
 	if er != nil {
 		return false
 	}
@@ -48,7 +48,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	ch, w, err := s.next()
+	ch, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 		var gerr error
 	main:
 		for {
-			nx, w, err := s.next()
+			nx, w, err := s.Next()
 			if err != nil {
 				if err == io.EOF {
 					return nil, errors.New("missing closing string")
@@ -73,7 +73,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 				return tk, nil
 			}
 			if nx == backSlash {
-				nxt, w, err := s.next()
+				nxt, w, err := s.Next()
 				if err != nil {
 					return nil, err
 				}
@@ -81,7 +81,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 				buf.WriteRune(nxt)
 				switch {
 				case nxt == '0':
-					next, w, err := s.next()
+					next, w, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
@@ -92,7 +92,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					}
 					continue
 				case nx == 'x':
-					next, w, err := s.next()
+					next, w, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
@@ -103,7 +103,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					}
 					continue
 				case nxt == 'u':
-					next, w, err := s.next()
+					next, w, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
@@ -111,7 +111,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					buf.WriteRune(next)
 					if isHexDigit(next) {
 						for i := 0; i < 3; i++ {
-							next, w, err = s.next()
+							next, w, err = s.Next()
 							if err != nil {
 								return nil, err
 							}
@@ -125,7 +125,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					}
 					if next == '{' {
 						for {
-							next, w, err = s.next()
+							next, w, err = s.Next()
 							if err != nil {
 								return nil, err
 							}

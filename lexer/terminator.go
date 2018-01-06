@@ -9,7 +9,7 @@ func (lineTerminatorLexer) name() string {
 }
 
 func (lineTerminatorLexer) accept(s scanner) bool {
-	n, _, err := s.peek()
+	n, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -30,7 +30,7 @@ func (t lineTerminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	n, _, err := s.next()
+	n, _, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -46,13 +46,13 @@ func (t lineTerminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 			tk.Kind = LF
 		case 0x000D:
 			tk.Kind = CR
-			nxt, _, err := s.peek()
+			nxt, _, err := s.Peek()
 			if err == nil {
 				//http://ecma-international.org/ecma-262/#sec-line-terminators
 				//
 				// Treat <CR><LF> as <CR>.
 				if nxt == 0x0000A {
-					s.next()
+					s.Next()
 				}
 			}
 		case 0x02028:

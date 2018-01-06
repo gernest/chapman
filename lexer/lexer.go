@@ -260,11 +260,12 @@ func getKind(k string) kind {
 	return reverseKindMap[k]
 }
 
+// scanner is an interface for reading one token at a time from UTF text.
 type scanner interface {
-	next() (rune, int, error)
-	peek() (rune, int, error)
-	peekAt(n int) (rune, int, error)
-	rewind() error
+	Next() (rune, int, error)
+	Peek() (rune, int, error)
+	PeekAt(n int) (rune, int, error)
+	Rewind() error
 }
 
 type bufioScanner struct {
@@ -274,16 +275,16 @@ type bufioScanner struct {
 func newBufioScanner(r io.Reader) *bufioScanner {
 	return &bufioScanner{src: bufio.NewReader(r)}
 }
-func (b *bufioScanner) next() (rune, int, error) {
+func (b *bufioScanner) Next() (rune, int, error) {
 	return b.src.ReadRune()
 }
 
-func (b *bufioScanner) peek() (ch rune, size int, err error) {
-	return b.peekAt(1)
+func (b *bufioScanner) Peek() (ch rune, size int, err error) {
+	return b.PeekAt(1)
 }
 
 // reads the nth rune without advancing the reader
-func (b *bufioScanner) peekAt(n int) (ch rune, size int, err error) {
+func (b *bufioScanner) PeekAt(n int) (ch rune, size int, err error) {
 	bv, err := b.peekChunck(n)
 	width := 0
 	for i := 0; i < n; i++ {
@@ -293,7 +294,7 @@ func (b *bufioScanner) peekAt(n int) (ch rune, size int, err error) {
 	return
 }
 
-func (b *bufioScanner) rewind() error {
+func (b *bufioScanner) Rewind() error {
 	return b.src.UnreadRune()
 }
 

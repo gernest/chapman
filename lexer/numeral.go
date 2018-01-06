@@ -12,7 +12,7 @@ func (numeralLexer) name() string {
 }
 
 func (numeralLexer) accept(s scanner) bool {
-	ch, _, err := s.peek()
+	ch, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -23,7 +23,7 @@ func isFloat(s scanner, ch rune) bool {
 	if ch != '.' {
 		return false
 	}
-	p, _, err := s.peekAt(2)
+	p, _, err := s.PeekAt(2)
 	if err != nil {
 		return false
 	}
@@ -76,14 +76,14 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	nx, w, err := s.next()
+	nx, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
 	if isDecimalDigit(nx) || isFloat(s, nx) {
 		end.Column += w
 		tk := &token{Start: start, Text: string(nx)}
-		nxt, w, err := s.next()
+		nxt, w, err := s.Next()
 		if err != nil {
 			if err == io.EOF {
 				tk.Kind = INT
@@ -92,7 +92,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 			return nil, err
 		}
 		if isTokenSep(nxt) {
-			s.rewind()
+			s.Rewind()
 			tk.Kind = INT
 			return tk, nil
 		}
@@ -100,7 +100,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		tk.Text += string(nxt)
 
 		if nxt == '.' {
-			ch, w, err := s.next()
+			ch, w, err := s.Next()
 			if err != nil {
 				return nil, err
 			}
@@ -109,7 +109,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 				end.Column += w
 				tk.Text += string(ch)
 				for {
-					ch, w, err = s.next()
+					ch, w, err = s.Next()
 					if err != nil {
 						if err == io.EOF {
 							break
@@ -125,7 +125,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					if ch == 'e' || ch == 'E' {
 						tk.Text += string(ch)
 						end.Column += w
-						ch, w, err = s.next()
+						ch, w, err = s.Next()
 						if err != nil {
 							return nil, err
 						}
@@ -147,7 +147,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		if nx == '0' && nxt == 'x' || nxt == 'X' {
 			tk.Kind = HEX
 			for {
-				ch, w, err := s.next()
+				ch, w, err := s.Next()
 				if err != nil {
 					if err == io.EOF {
 						break
@@ -161,7 +161,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					continue
 				}
 				if isTokenSep(ch) {
-					s.rewind()
+					s.Rewind()
 					break
 				}
 				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
@@ -171,7 +171,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		if nx == '0' && nxt == 'b' || nxt == 'B' {
 			tk.Kind = BINARY
 			for {
-				ch, w, err := s.next()
+				ch, w, err := s.Next()
 				if err != nil {
 					if err == io.EOF {
 						break
@@ -185,7 +185,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					continue
 				}
 				if isTokenSep(ch) {
-					s.rewind()
+					s.Rewind()
 					break
 				}
 				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
@@ -195,7 +195,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		if nx == '0' && nxt == 'o' || nxt == 'O' {
 			tk.Kind = OCTAL
 			for {
-				ch, w, err := s.next()
+				ch, w, err := s.Next()
 				if err != nil {
 					if err == io.EOF {
 						break
@@ -209,7 +209,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					continue
 				}
 				if isTokenSep(ch) {
-					s.rewind()
+					s.Rewind()
 					break
 				}
 				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
@@ -219,7 +219,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 		if isDecimalDigit(nxt) {
 			tk.Kind = INT
 			for {
-				ch, w, err := s.next()
+				ch, w, err := s.Next()
 				if err != nil {
 					if err == io.EOF {
 						break
@@ -235,7 +235,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 				if ch == 'e' || ch == 'E' {
 					tk.Text += string(ch)
 					end.Column += w
-					ch, w, err = s.next()
+					ch, w, err = s.Next()
 					if err != nil {
 						return nil, err
 					}

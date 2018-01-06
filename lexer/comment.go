@@ -13,12 +13,12 @@ func (singleLineCommentLexer) name() string {
 }
 
 func (singleLineCommentLexer) accept(s scanner) bool {
-	n, _, err := s.peekAt(1)
+	n, _, err := s.PeekAt(1)
 	if err != nil {
 		return false
 	}
 	if n == '/' {
-		nx, _, err := s.peekAt(2)
+		nx, _, err := s.PeekAt(2)
 		if err != nil {
 			return false
 		}
@@ -34,13 +34,13 @@ func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	n, w, err := s.next()
+	n, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
 	end.Column += w
 	if n == '/' {
-		nx, w, err := s.next()
+		nx, w, err := s.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -50,7 +50,7 @@ func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 			tk := &token{Kind: SingleLineComment}
 			b.WriteString("//")
 			for {
-				x, w, err := s.next()
+				x, w, err := s.Next()
 				if err != nil {
 					if err == io.EOF {
 						tk.Text = b.String()
@@ -81,12 +81,12 @@ func (multiLineCommentLexer) name() string {
 }
 
 func (multiLineCommentLexer) accept(s scanner) bool {
-	n, _, err := s.peekAt(1)
+	n, _, err := s.PeekAt(1)
 	if err != nil {
 		return false
 	}
 	if n == '/' {
-		nx, _, err := s.peekAt(2)
+		nx, _, err := s.PeekAt(2)
 		if err != nil {
 			return false
 		}
@@ -102,13 +102,13 @@ func (m multiLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	n, w, err := s.next()
+	n, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
 	end.Column += w
 	if n == '/' {
-		nx, w, err := s.next()
+		nx, w, err := s.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -118,7 +118,7 @@ func (m multiLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 			tk := &token{Kind: MultiLineComment, Start: start}
 			b.WriteString("/*")
 			for {
-				x, w, err := s.next()
+				x, w, err := s.Next()
 				if err != nil {
 					return nil, err
 				}
@@ -131,7 +131,7 @@ func (m multiLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 				end.Column += w
 				b.WriteRune(x)
 				if x == '*' {
-					nxt, size, err := s.next()
+					nxt, size, err := s.Next()
 					if err != nil {
 						return nil, err
 					}

@@ -15,7 +15,7 @@ func (identifierNameLexer) name() string {
 }
 
 func (identifierNameLexer) accept(s scanner) bool {
-	ch, _, err := s.peek()
+	ch, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -25,7 +25,7 @@ func (identifierNameLexer) accept(s scanner) bool {
 
 func escapeSequence(ch rune, s scanner) bool {
 	if ch == reverseSolidus {
-		n, _, err := s.peekAt(2)
+		n, _, err := s.PeekAt(2)
 		if err != nil {
 			return false
 		}
@@ -56,7 +56,7 @@ func (i identifierNameLexer) lex(s scanner, ctx *context) (*token, error) {
 }
 
 func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *bytes.Buffer) (*position, error) {
-	n, w, err := s.next()
+	n, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 		b.WriteRune(n)
 	} else if n == reverseSolidus {
 		b.WriteRune(n)
-		nx, w, err := s.next()
+		nx, w, err := s.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -76,7 +76,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 		b.WriteRune(nx)
 
 		// wer are lexing a valid UnicodeEscapeSequence
-		nx, w, err = s.next()
+		nx, w, err = s.Next()
 		if err != nil {
 			return nil, err
 		}
@@ -85,7 +85,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 		if isHexDigit(nx) {
 			// four hex digits, we already have one three to go
 			for k := 0; k < 3; k++ {
-				nx, w, err = s.next()
+				nx, w, err = s.Next()
 				if err != nil {
 					return nil, err
 				}
@@ -99,7 +99,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 		}
 		if nx == '{' {
 			for {
-				nx, w, err = s.next()
+				nx, w, err = s.Next()
 				if err != nil {
 					return nil, err
 				}
@@ -125,7 +125,7 @@ func (i identifierNameLexer) lexPart(s scanner, ctx *context, end position, b *b
 			}
 			end.Column = e.Column
 		} else {
-			nx, w, err := s.peek()
+			nx, w, err := s.Peek()
 			if err != nil {
 				if err == io.EOF {
 					return &end, nil
@@ -133,7 +133,7 @@ func (i identifierNameLexer) lexPart(s scanner, ctx *context, end position, b *b
 				return nil, err
 			}
 			if isUnicodeIDContinue(nx) || nx == 0x200C || nx == 0x200D {
-				s.next()
+				s.Next()
 				end.Column += w
 				b.WriteRune(nx)
 				continue

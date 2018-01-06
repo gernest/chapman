@@ -35,7 +35,7 @@ func TestBufioScanner_peekAt(t *testing.T) {
 	b := newBufioScanner(strings.NewReader(a))
 
 	for i := 1; i <= len(a); i++ {
-		x, _, err := b.peekAt(i)
+		x, _, err := b.PeekAt(i)
 		if err != nil {
 			t.Fatal(err)
 		}

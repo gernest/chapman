@@ -12,7 +12,7 @@ func (boolLexer) name() string {
 }
 
 func (boolLexer) accept(s scanner) bool {
-	n, _, err := s.peek()
+	n, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -21,7 +21,7 @@ func (boolLexer) accept(s scanner) bool {
 	case 't':
 		b.WriteRune(n)
 		for i := 2; i < 5; i++ {
-			n, _, err := s.peekAt(i)
+			n, _, err := s.PeekAt(i)
 			if err != nil {
 				return false
 			}
@@ -31,7 +31,7 @@ func (boolLexer) accept(s scanner) bool {
 	case 'f':
 		b.WriteRune(n)
 		for i := 2; i < 6; i++ {
-			n, _, err := s.peekAt(i)
+			n, _, err := s.PeekAt(i)
 			if err != nil {
 				return false
 			}
@@ -48,7 +48,7 @@ func (b boolLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	nx, w, err := s.next()
+	nx, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (b boolLexer) lex(s scanner, ctx *context) (*token, error) {
 		var b bytes.Buffer
 		b.WriteRune(nx)
 		for i := 0; i < limit; i++ {
-			nx, w, err = s.next()
+			nx, w, err = s.Next()
 			if err != nil {
 				return nil, err
 			}

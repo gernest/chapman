@@ -65,7 +65,7 @@ func (punctuatorLexer) name() string {
 }
 
 func (punctuatorLexer) accept(s scanner) bool {
-	ch, _, err := s.peek()
+	ch, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -81,14 +81,14 @@ func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	nx, w, err := s.next()
+	nx, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
 	chrs := string(nx)
 	end.Column += w
 	for p.accept(s) {
-		nxt, w, err := s.next()
+		nxt, w, err := s.Next()
 		if err != nil {
 			return nil, err
 		}

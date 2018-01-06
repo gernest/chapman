@@ -12,7 +12,7 @@ func (nullLexer) name() string {
 }
 
 func (nullLexer) accept(s scanner) bool {
-	n, _, err := s.peek()
+	n, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -20,7 +20,7 @@ func (nullLexer) accept(s scanner) bool {
 		var b bytes.Buffer
 		b.WriteRune(n)
 		for i := 2; i < 5; i++ {
-			n, _, err := s.peekAt(i)
+			n, _, err := s.PeekAt(i)
 			if err != nil {
 				return false
 			}
@@ -36,14 +36,14 @@ func (n nullLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	nx, w, err := s.next()
+	nx, w, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
 	chrs := string(nx)
 	end.Column += w
 	for i := 0; i < 3; i++ {
-		nx, w, err = s.next()
+		nx, w, err = s.Next()
 		if err != nil {
 			return nil, err
 		}

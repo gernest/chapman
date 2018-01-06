@@ -12,7 +12,7 @@ func (whiteSpaceLexer) name() string {
 }
 
 func (whiteSpaceLexer) accept(s scanner) bool {
-	n, _, err := s.peek()
+	n, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
@@ -33,7 +33,7 @@ func (w whiteSpaceLexer) lex(s scanner, ctx *context) (*token, error) {
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
 	}
-	n, size, err := s.next()
+	n, size, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
