@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -68,17 +69,48 @@ func TestLexer(t *testing.T) {
 	if ferr != nil {
 		t.Fatal(ferr)
 	}
+	limit := "fixture/core/uncategorised/101/actual.js"
 	for _, f := range files {
-		t.Run(filepath.Dir(f), func(ts *testing.T) {
-			b, err := ioutil.ReadFile(f)
-			if err != nil {
-				ts.Fatal(err)
-			}
-			_, err = lex(bytes.NewReader(b), defaultLexMe()...)
-			if err != nil {
-				abs, _ := filepath.Abs(f)
-				t.Error(fmt.Errorf("%s : %v", abs, err))
-			}
-		})
+		if f == limit {
+			t.Run(filepath.Dir(f), func(ts *testing.T) {
+				b, err := ioutil.ReadFile(f)
+				if err != nil {
+					ts.Fatal(err)
+				}
+				op, err := opts(filepath.Dir(f))
+				if err != nil {
+					ts.Fatal(err)
+				}
+				_, err = lex(bytes.NewReader(b), defaultLexMe()...)
+				if op.Throws {
+					if err == nil {
+						abs, _ := filepath.Abs(f)
+						t.Error(fmt.Errorf("%s : expected an error", abs))
+					}
+				} else {
+					if err != nil {
+						abs, _ := filepath.Abs(f)
+						t.Error(fmt.Errorf("%s : %v", abs, err))
+					}
+				}
+			})
+		}
 	}
+}
+
+type options struct {
+	Throws bool `json:"throws"`
+}
+
+func opts(dir string) (*options, error) {
+	b, err := ioutil.ReadFile(filepath.Join(dir, "options.json"))
+	if err != nil {
+		return nil, err
+	}
+	o := &options{}
+	err = json.Unmarshal(b, o)
+	if err != nil {
+		return nil, err
+	}
+	return o, nil
 }

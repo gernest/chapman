@@ -19,6 +19,7 @@ func TestStringLexer(t *testing.T) {
 		`"\xg0\r\n"`,
 		`"\xgg"`,
 		`"\u1"`,
+		`"Hello\1World"`,
 	}
 
 	var l stringLexer

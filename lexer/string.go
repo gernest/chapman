@@ -1,7 +1,6 @@
 package lexer
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -44,98 +43,90 @@ func (stringLexer) Accept(s scanner) bool {
 }
 
 func (sl stringLexer) Lex(s scanner, ctx *context) (*token, error) {
-	var start, end position
+	var start position
 	if ctx.lastToken != nil {
-		start, end = ctx.lastToken.End, start
+		start = ctx.lastToken.End
 	}
-	ch, w, err := s.Next()
+	ch, _, err := s.Next()
 	if err != nil {
 		return nil, err
 	}
-	end.Column += w
-	var buf bytes.Buffer
-	buf.WriteRune(ch)
+	tk := newToken(start)
+	tk.AddRune(ch)
 	if ch == '"' {
 		var gerr error
 	main:
 		for {
-			nx, w, err := s.Next()
+			nx, _, err := s.Next()
 			if err != nil {
 				if err == io.EOF {
 					return nil, errors.New("missing closing string")
 				}
 				return nil, err
 			}
-			end.Column += w
-			buf.WriteRune(nx)
+			tk.AddRune(nx)
 			if nx == '"' {
-				tk := &token{Start: start, Text: buf.String(), End: end}
+				tk.AddRune(nx)
 				return tk, nil
 			}
 			if nx == backSlash {
-				nxt, w, err := s.Next()
+				nxt, _, err := s.Next()
 				if err != nil {
 					return nil, err
 				}
-				end.Column += w
-				buf.WriteRune(nxt)
+				tk.AddRune(nxt)
 				switch {
 				case nxt == '0':
-					next, w, err := s.Next()
+					next, _, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
-					end.Column += w
-					buf.WriteRune(next)
+					tk.AddRune(next)
 					if !isDecimalDigit(next) {
-						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
+						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 					}
 					continue
 				case nx == 'x':
-					next, w, err := s.Next()
+					next, _, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
-					end.Column += w
-					buf.WriteRune(next)
+					tk.AddRune(next)
 					if !isHexDigit(next) {
-						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
+						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 					}
 					continue
 				case nxt == 'u':
-					next, w, err := s.Next()
+					next, _, err := s.Next()
 					if err != nil {
 						return nil, err
 					}
-					end.Column += w
-					buf.WriteRune(next)
+					tk.AddRune(next)
 					if isHexDigit(next) {
 						for i := 0; i < 3; i++ {
-							next, w, err = s.Next()
+							next, _, err = s.Next()
 							if err != nil {
 								return nil, err
 							}
-							end.Column += w
-							buf.WriteRune(next)
+							tk.AddRune(next)
 							if !isHexDigit(next) {
-								return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
+								return nil, fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 							}
 						}
 						continue
 					}
 					if next == '{' {
 						for {
-							next, w, err = s.Next()
+							next, _, err = s.Next()
 							if err != nil {
 								return nil, err
 							}
-							end.Column += w
-							buf.WriteRune(next)
+							tk.AddRune(next)
 							if next == '}' {
 								continue
 							}
 							if !isHexDigit(next) {
-								gerr = fmt.Errorf(unexpectedTkn, sl.Name(), end)
+								gerr = fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 								break main
 							}
 						}
@@ -143,7 +134,7 @@ func (sl stringLexer) Lex(s scanner, ctx *context) (*token, error) {
 				case isSingleCharacterEscape(nxt) || isNonEscapeChar(nxt):
 					continue
 				default:
-					return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 				}
 			}
 		}
@@ -151,5 +142,5 @@ func (sl stringLexer) Lex(s scanner, ctx *context) (*token, error) {
 			return nil, gerr
 		}
 	}
-	return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, sl.Name(), tk.End)
 }
