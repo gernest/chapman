@@ -21,6 +21,15 @@ type token struct {
 	End   position
 }
 
+func newToken(start position) *token {
+	return &token{Start: start}
+}
+
+func (t *token) AddText(txt string) {
+	t.Text += txt
+	t.End.Column += len(txt)
+}
+
 func printToken(tk *token) []byte {
 	tk.RKind = tk.Kind.String()
 	b, err := json.MarshalIndent(tk, "", "\t")
