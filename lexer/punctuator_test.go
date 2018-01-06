@@ -17,7 +17,11 @@ func TestPunctuatorLexer(t *testing.T) {
 			t.Fatal(err)
 		}
 		if tk.Text != v {
-			t.Errorf("expected %s got %s", v, tk.Text)
+			t.Errorf("expected  %s got %s", v, tk.Text)
+		}
+		k := puncsKind[v]
+		if k != tk.Kind {
+			t.Errorf("%s :expected %s got %s", v, k, tk.Kind)
 		}
 	}
 }
