@@ -10,10 +10,10 @@ func TestNullLexer(t *testing.T) {
 	sample := []string{"null"}
 	for _, v := range sample {
 		s := newBufioScanner(strings.NewReader(v))
-		if !l.accept(s) {
+		if !l.Accept(s) {
 			t.Error("expected to accept", v)
 		}
-		tk, err := l.lex(s, &context{})
+		tk, err := l.Lex(s, &context{})
 		if err != nil {
 			t.Fatal(err)
 		}

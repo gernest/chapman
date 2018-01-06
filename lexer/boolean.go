@@ -7,11 +7,11 @@ import (
 
 type boolLexer struct{}
 
-func (boolLexer) name() string {
+func (boolLexer) Name() string {
 	return "boolean"
 }
 
-func (boolLexer) accept(s scanner) bool {
+func (boolLexer) Accept(s scanner) bool {
 	n, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -43,7 +43,7 @@ func (boolLexer) accept(s scanner) bool {
 	}
 }
 
-func (b boolLexer) lex(s scanner, ctx *context) (*token, error) {
+func (b boolLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -78,5 +78,5 @@ func (b boolLexer) lex(s scanner, ctx *context) (*token, error) {
 			return tk, nil
 		}
 	}
-	return nil, fmt.Errorf(unexpectedTkn, b.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, b.Name(), end)
 }

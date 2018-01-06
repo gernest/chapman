@@ -4,11 +4,11 @@ import "fmt"
 
 type lineTerminatorLexer struct{}
 
-func (lineTerminatorLexer) name() string {
+func (lineTerminatorLexer) Name() string {
 	return "LineTerminator"
 }
 
-func (lineTerminatorLexer) accept(s scanner) bool {
+func (lineTerminatorLexer) Accept(s scanner) bool {
 	n, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -25,7 +25,7 @@ func isLineTerminator(ch rune) bool {
 	}
 }
 
-func (t lineTerminatorLexer) lex(s scanner, ctx *context) (*token, error) {
+func (t lineTerminatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -62,5 +62,5 @@ func (t lineTerminatorLexer) lex(s scanner, ctx *context) (*token, error) {
 		}
 		return tk, nil
 	}
-	return nil, fmt.Errorf(unexpectedTkn, t.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, t.Name(), end)
 }

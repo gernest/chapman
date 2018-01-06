@@ -24,7 +24,7 @@ func TestStringLexer(t *testing.T) {
 	var l stringLexer
 	for _, v := range badStrings {
 		s := newBufioScanner(strings.NewReader(v))
-		_, err := l.lex(s, &context{})
+		_, err := l.Lex(s, &context{})
 		if err == nil {
 			t.Errorf("expected an error for %v", v)
 		}
@@ -55,7 +55,7 @@ func TestStringLexer(t *testing.T) {
 	}
 	for _, v := range goodStrings {
 		s := newBufioScanner(strings.NewReader(v))
-		_, err := l.lex(s, &context{})
+		_, err := l.Lex(s, &context{})
 		if err != nil {
 			t.Error(err)
 		}

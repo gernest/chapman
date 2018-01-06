@@ -8,11 +8,11 @@ import (
 
 type singleLineCommentLexer struct{}
 
-func (singleLineCommentLexer) name() string {
+func (singleLineCommentLexer) Name() string {
 	return "singleLineComment"
 }
 
-func (singleLineCommentLexer) accept(s scanner) bool {
+func (singleLineCommentLexer) Accept(s scanner) bool {
 	n, _, err := s.PeekAt(1)
 	if err != nil {
 		return false
@@ -29,7 +29,7 @@ func (singleLineCommentLexer) accept(s scanner) bool {
 	return false
 }
 
-func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
+func (c singleLineCommentLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -71,16 +71,16 @@ func (c singleLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 			}
 		}
 	}
-	return nil, fmt.Errorf(unexpectedTkn, c.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, c.Name(), end)
 }
 
 type multiLineCommentLexer struct{}
 
-func (multiLineCommentLexer) name() string {
+func (multiLineCommentLexer) Name() string {
 	return "multiLineComment"
 }
 
-func (multiLineCommentLexer) accept(s scanner) bool {
+func (multiLineCommentLexer) Accept(s scanner) bool {
 	n, _, err := s.PeekAt(1)
 	if err != nil {
 		return false
@@ -97,7 +97,7 @@ func (multiLineCommentLexer) accept(s scanner) bool {
 	return false
 }
 
-func (m multiLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
+func (m multiLineCommentLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -150,5 +150,5 @@ func (m multiLineCommentLexer) lex(s scanner, ctx *context) (*token, error) {
 			}
 		}
 	}
-	return nil, fmt.Errorf(unexpectedTkn, m.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, m.Name(), end)
 }

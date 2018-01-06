@@ -7,11 +7,11 @@ import (
 
 type nullLexer struct{}
 
-func (nullLexer) name() string {
+func (nullLexer) Name() string {
 	return "null"
 }
 
-func (nullLexer) accept(s scanner) bool {
+func (nullLexer) Accept(s scanner) bool {
 	n, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -31,7 +31,7 @@ func (nullLexer) accept(s scanner) bool {
 	return false
 }
 
-func (n nullLexer) lex(s scanner, ctx *context) (*token, error) {
+func (n nullLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -58,5 +58,5 @@ func (n nullLexer) lex(s scanner, ctx *context) (*token, error) {
 			End:   end,
 		}, nil
 	}
-	return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 }

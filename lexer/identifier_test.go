@@ -9,10 +9,10 @@ func TestIdentifierNameLexer(t *testing.T) {
 	var l identifierNameLexer
 	for _, v := range keywords {
 		s := newBufioScanner(strings.NewReader(v))
-		if !l.accept(s) {
+		if !l.Accept(s) {
 			t.Error("expected to accept")
 		}
-		tk, err := l.lex(s, &context{})
+		tk, err := l.Lex(s, &context{})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -27,10 +27,10 @@ func TestIdentifierNameLexer(t *testing.T) {
 	}
 	for _, v := range escapes {
 		s := newBufioScanner(strings.NewReader(v))
-		if !l.accept(s) {
+		if !l.Accept(s) {
 			t.Error("expected to accept", v)
 		}
-		tk, err := l.lex(s, &context{})
+		tk, err := l.Lex(s, &context{})
 		if err != nil {
 			t.Fatal(err)
 		}

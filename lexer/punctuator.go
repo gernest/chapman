@@ -60,11 +60,11 @@ var puncs = map[string]bool{
 
 type punctuatorLexer struct{}
 
-func (punctuatorLexer) name() string {
+func (punctuatorLexer) Name() string {
 	return "punctuator"
 }
 
-func (punctuatorLexer) accept(s scanner) bool {
+func (punctuatorLexer) Accept(s scanner) bool {
 	ch, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -76,7 +76,7 @@ func isPunctuator(ch string) bool {
 	return puncs[ch]
 }
 
-func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
+func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -87,7 +87,7 @@ func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
 	}
 	chrs := string(nx)
 	end.Column += w
-	for p.accept(s) {
+	for p.Accept(s) {
 		nxt, w, err := s.Next()
 		if err != nil {
 			return nil, err
@@ -254,6 +254,6 @@ func (p punctuatorLexer) lex(s scanner, ctx *context) (*token, error) {
 		tk.Kind = QuoAssign
 		return tk, nil
 	default:
-		return nil, fmt.Errorf(unexpectedTkn, p.name(), end)
+		return nil, fmt.Errorf(unexpectedTkn, p.Name(), end)
 	}
 }

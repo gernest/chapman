@@ -13,7 +13,7 @@ const singleQuote = 0x2019
 
 type stringLexer struct{}
 
-func (stringLexer) name() string {
+func (stringLexer) Name() string {
 	return "string"
 }
 
@@ -35,7 +35,7 @@ func isEscapeChar(ch rune) bool {
 		isDecimalDigit(ch) || ch == 'x' || ch == 'u'
 }
 
-func (stringLexer) accept(s scanner) bool {
+func (stringLexer) Accept(s scanner) bool {
 	ch, _, er := s.Peek()
 	if er != nil {
 		return false
@@ -43,7 +43,7 @@ func (stringLexer) accept(s scanner) bool {
 	return ch == '"' || string(ch) == "'"
 }
 
-func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
+func (sl stringLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -88,7 +88,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					end.Column += w
 					buf.WriteRune(next)
 					if !isDecimalDigit(next) {
-						return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
 					}
 					continue
 				case nx == 'x':
@@ -99,7 +99,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 					end.Column += w
 					buf.WriteRune(next)
 					if !isHexDigit(next) {
-						return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+						return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
 					}
 					continue
 				case nxt == 'u':
@@ -118,7 +118,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 							end.Column += w
 							buf.WriteRune(next)
 							if !isHexDigit(next) {
-								return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+								return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
 							}
 						}
 						continue
@@ -135,7 +135,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 								continue
 							}
 							if !isHexDigit(next) {
-								gerr = fmt.Errorf(unexpectedTkn, sl.name(), end)
+								gerr = fmt.Errorf(unexpectedTkn, sl.Name(), end)
 								break main
 							}
 						}
@@ -143,7 +143,7 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 				case isSingleCharacterEscape(nxt) || isNonEscapeChar(nxt):
 					continue
 				default:
-					return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
 				}
 			}
 		}
@@ -151,5 +151,5 @@ func (sl stringLexer) lex(s scanner, ctx *context) (*token, error) {
 			return nil, gerr
 		}
 	}
-	return nil, fmt.Errorf(unexpectedTkn, sl.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, sl.Name(), end)
 }

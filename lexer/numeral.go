@@ -7,11 +7,11 @@ import (
 
 type numeralLexer struct{}
 
-func (numeralLexer) name() string {
+func (numeralLexer) Name() string {
 	return "numeral"
 }
 
-func (numeralLexer) accept(s scanner) bool {
+func (numeralLexer) Accept(s scanner) bool {
 	ch, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -71,7 +71,7 @@ func isHexDigit(ch rune) bool {
 	}
 }
 
-func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
+func (n numeralLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -134,12 +134,12 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 							end.Column += w
 							continue
 						}
-						return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+						return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 					}
 					if isTokenSep(ch) {
 						break
 					}
-					return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 				}
 				return tk, nil
 			}
@@ -164,7 +164,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					s.Rewind()
 					break
 				}
-				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+				return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 			}
 			return tk, nil
 		}
@@ -188,7 +188,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					s.Rewind()
 					break
 				}
-				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+				return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 			}
 			return tk, nil
 		}
@@ -212,7 +212,7 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 					s.Rewind()
 					break
 				}
-				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+				return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 			}
 			return tk, nil
 		}
@@ -244,17 +244,17 @@ func (n numeralLexer) lex(s scanner, ctx *context) (*token, error) {
 						end.Column += w
 						continue
 					}
-					return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 				}
 				if isTokenSep(ch) {
 					break
 				}
-				return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+				return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 			}
 			return tk, nil
 		}
 
 	}
 
-	return nil, fmt.Errorf(unexpectedTkn, n.name(), end)
+	return nil, fmt.Errorf(unexpectedTkn, n.Name(), end)
 }

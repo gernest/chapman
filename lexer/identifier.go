@@ -10,11 +10,11 @@ const reverseSolidus = 0x005C // backslash
 
 type identifierNameLexer struct{}
 
-func (identifierNameLexer) name() string {
+func (identifierNameLexer) Name() string {
 	return "identifierName"
 }
 
-func (identifierNameLexer) accept(s scanner) bool {
+func (identifierNameLexer) Accept(s scanner) bool {
 	ch, _, err := s.Peek()
 	if err != nil {
 		return false
@@ -34,7 +34,7 @@ func escapeSequence(ch rune, s scanner) bool {
 	return false
 }
 
-func (i identifierNameLexer) lex(s scanner, ctx *context) (*token, error) {
+func (i identifierNameLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start, end position
 	if ctx.lastToken != nil {
 		start, end = ctx.lastToken.End, start
@@ -71,7 +71,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 		}
 		end.Column += w
 		if nx != 'u' {
-			return nil, fmt.Errorf(unexpectedTkn, i.name(), end)
+			return nil, fmt.Errorf(unexpectedTkn, i.Name(), end)
 		}
 		b.WriteRune(nx)
 
@@ -92,7 +92,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 				end.Column += w
 				b.WriteRune(nx)
 				if !isHexDigit(nx) {
-					return nil, fmt.Errorf(unexpectedTkn, i.name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, i.Name(), end)
 				}
 			}
 			return &end, nil
@@ -109,7 +109,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 					if nx == '}' {
 						return &end, nil
 					}
-					return nil, fmt.Errorf(unexpectedTkn, i.name(), end)
+					return nil, fmt.Errorf(unexpectedTkn, i.Name(), end)
 				}
 			}
 		}
@@ -118,7 +118,7 @@ func (i identifierNameLexer) lexStart(s scanner, ctx *context, end position, b *
 }
 func (i identifierNameLexer) lexPart(s scanner, ctx *context, end position, b *bytes.Buffer) (*position, error) {
 	for {
-		if i.accept(s) {
+		if i.Accept(s) {
 			e, err := i.lexStart(s, ctx, end, b)
 			if err != nil {
 				return nil, err

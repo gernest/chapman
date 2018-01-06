@@ -317,9 +317,9 @@ func (p position) String() string {
 }
 
 type lexMe interface {
-	name() string
-	accept(scanner) bool
-	lex(scanner, *context) (*token, error)
+	Name() string
+	Accept(scanner) bool
+	Lex(scanner, *context) (*token, error)
 }
 
 // make sure all lexers implement lexMe interface
@@ -339,11 +339,11 @@ func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 	s := &bufioScanner{bufio.NewReader(src)}
 	ctx := &context{lexers: make(map[string]lexMe)}
 	for _, v := range lexmes {
-		ctx.lexers[v.name()] = v
+		ctx.lexers[v.Name()] = v
 	}
 	nextLexer := func() lexMe {
 		for i := 0; i < len(lexmes); i++ {
-			if lexmes[i].accept(s) {
+			if lexmes[i].Accept(s) {
 				return lexmes[i]
 			}
 		}
@@ -355,7 +355,7 @@ func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 		if v == nil {
 			break
 		}
-		tk, err := v.lex(s, ctx)
+		tk, err := v.Lex(s, ctx)
 		if err != nil {
 			return tokens, err
 		}
