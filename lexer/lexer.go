@@ -340,7 +340,7 @@ var (
 	_ lexMe = multiLineCommentLexer{}
 	_ lexMe = lineTerminatorLexer{}
 	_ lexMe = identifierNameLexer{}
-	_ lexMe = punctuatorLexer{}
+	_ lexMe = punctuationLexer{}
 	_ lexMe = boolLexer{}
 	_ lexMe = nullLexer{}
 	_ lexMe = numeralLexer{}
@@ -354,7 +354,7 @@ func defaultLexMe() []lexMe {
 		multiLineCommentLexer{},
 		lineTerminatorLexer{},
 		identifierNameLexer{},
-		punctuatorLexer{},
+		punctuationLexer{},
 		boolLexer{},
 		nullLexer{},
 		numeralLexer{},

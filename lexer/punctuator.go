@@ -5,7 +5,7 @@ import (
 	"io"
 )
 
-var puncs = map[string]bool{
+var punctuation = map[string]bool{
 	"{":    true,
 	"(":    true,
 	")":    true,
@@ -59,7 +59,7 @@ var puncs = map[string]bool{
 	"}":    true,
 }
 
-var puncsKind = map[string]kind{
+var punctuationKind = map[string]kind{
 	"{":    LBRACE,
 	"(":    LPAREN,
 	")":    RPAREN,
@@ -113,25 +113,25 @@ var puncsKind = map[string]kind{
 	"}":    RBRACE,
 }
 
-type punctuatorLexer struct{}
+type punctuationLexer struct{}
 
-func (punctuatorLexer) Name() string {
-	return "punctuator"
+func (punctuationLexer) Name() string {
+	return "punctuation"
 }
 
-func (punctuatorLexer) Accept(s scanner) bool {
+func (punctuationLexer) Accept(s scanner) bool {
 	ch, _, err := s.Peek()
 	if err != nil {
 		return false
 	}
-	return isPunctuator(string(ch))
+	return isPunctuation(string(ch))
 }
 
-func isPunctuator(ch string) bool {
-	return puncs[ch]
+func isPunctuation(ch string) bool {
+	return punctuation[ch]
 }
 
-func (p punctuatorLexer) Lex(s scanner, ctx *context) (*token, error) {
+func (p punctuationLexer) Lex(s scanner, ctx *context) (*token, error) {
 	var start position
 	if ctx.lastToken != nil {
 		start = ctx.lastToken.End

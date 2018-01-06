@@ -5,9 +5,9 @@ import (
 	"testing"
 )
 
-func TestPunctuatorLexer(t *testing.T) {
-	var l punctuatorLexer
-	for v := range puncs {
+func TestPunctuationLexer(t *testing.T) {
+	var l punctuationLexer
+	for v := range punctuation {
 		s := newBufioScanner(strings.NewReader(v))
 		if !l.Accept(s) {
 			t.Error("expected to accept", v)
@@ -19,7 +19,7 @@ func TestPunctuatorLexer(t *testing.T) {
 		if tk.Text != v {
 			t.Errorf("expected  %s got %s", v, tk.Text)
 		}
-		k := puncsKind[v]
+		k := punctuationKind[v]
 		if k != tk.Kind {
 			t.Errorf("%s :expected %s got %s", v, k, tk.Kind)
 		}
