@@ -335,6 +335,21 @@ var (
 	_ lexMe = stringLexer{}
 )
 
+// defaultLexMe returns a list of all available lexers.
+func defaultLexMe() []lexMe {
+	return []lexMe{
+		singleLineCommentLexer{},
+		multiLineCommentLexer{},
+		lineTerminatorLexer{},
+		identifierNameLexer{},
+		punctuatorLexer{},
+		boolLexer{},
+		nullLexer{},
+		numeralLexer{},
+		stringLexer{},
+	}
+}
+
 func lex(src io.Reader, lexmes ...lexMe) ([]*token, error) {
 	s := &bufioScanner{bufio.NewReader(src)}
 	ctx := &context{lexers: make(map[string]lexMe)}
